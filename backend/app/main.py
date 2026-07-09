@@ -68,7 +68,7 @@ def create_app() -> FastAPI:
     - Metadata (title, version, docs URL)
     - CORS middleware
     - Global exception handlers
-    - API routers (mounted when implemented)
+    - API routers mounted under the /api/v1 prefix
     """
     app = FastAPI(
         title=settings.APP_NAME,
@@ -100,11 +100,22 @@ def create_app() -> FastAPI:
     app.add_exception_handler(AppException, app_exception_handler)
 
     # ── API Routers ──────────────────────────────────────────
-    # Routers will be registered here as they are implemented.
-    # Example:
-    #   from app.routers import auth_router, report_router, ...
-    #   app.include_router(auth_router.router)
-    #   app.include_router(report_router.router)
+    from app.routers import (
+        auth_router,
+        user_router,
+        report_router,
+        project_router,
+        dashboard_router,
+        ai_router,
+    )
+
+    # Mount API routers under prefix /api/v1
+    app.include_router(auth_router, prefix="/api/v1")
+    app.include_router(user_router, prefix="/api/v1")
+    app.include_router(report_router, prefix="/api/v1")
+    app.include_router(project_router, prefix="/api/v1")
+    app.include_router(dashboard_router, prefix="/api/v1")
+    app.include_router(ai_router, prefix="/api/v1")
 
     # ── Health Check ─────────────────────────────────────────
     @app.get(

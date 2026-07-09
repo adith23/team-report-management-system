@@ -83,6 +83,7 @@ async def get_current_user(
 
     # Step 3: Fetch user from database
     from app.models.user import User
+
     stmt = select(User).where(User.id == payload.sub)
     result = await db.execute(stmt)
     user = result.scalar_one_or_none()
@@ -143,3 +144,49 @@ def require_role(*allowed_roles: UserRole) -> Callable:
         return current_user
 
     return role_checker
+
+
+# ── Service Dependencies ─────────────────────────────────────────
+async def get_auth_service(db: AsyncSession = Depends(get_db)) -> "AuthService":
+    from app.repositories import UserRepository
+    from app.services import AuthService
+
+    return AuthService(UserRepository(db))
+
+
+async def get_user_service(db: AsyncSession = Depends(get_db)) -> "UserService":
+    from app.repositories import UserRepository
+    from app.services import UserService
+
+    return UserService(UserRepository(db))
+
+
+async def get_project_service(db: AsyncSession = Depends(get_db)) -> "ProjectService":
+    from app.repositories import ProjectRepository
+    from app.services import ProjectService
+
+    return ProjectService(ProjectRepository(db))
+
+
+async def get_report_service(db: AsyncSession = Depends(get_db)) -> "ReportService":
+    from app.repositories import ReportRepository, ProjectRepository
+    from app.services import ReportService
+
+    return ReportService(ReportRepository(db), ProjectRepository(db))
+
+
+async def get_dashboard_service(
+    db: AsyncSession = Depends(get_db),
+) -> "DashboardService":
+    from app.repositories import ReportRepository, UserRepository
+    from app.services import DashboardService
+
+    return DashboardService(ReportRepository(db), UserRepository(db))
+
+
+async def get_ai_service(db: AsyncSession = Depends(get_db)) -> "AIService":
+    from app.repositories import ReportRepository
+    from app.services import AIService
+    from app.services.ai.openai_strategy import OpenAIStrategy
+
+    return AIService(OpenAIStrategy(), ReportRepository(db))
