@@ -289,7 +289,7 @@ class ReportService:
 
         update_payload = {
             "status": status,
-            "submitted_at": datetime.now(timezone.utc),
+            "submitted_at": datetime.now(timezone.utc).replace(tzinfo=None),
         }
 
         return await self._report_repo.update(report, update_payload)

@@ -144,6 +144,24 @@ class WeeklyReport(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         order_by="ReportBlocker.sort_order",
     )
 
+    @property
+    def user_full_name(self) -> str:
+        return self.user.full_name if self.user else ""
+
+    @property
+    def project_name(self) -> str:
+        return self.project.name if self.project else ""
+
+    @property
+    def tasks_completed(self) -> list["ReportTask"]:
+        from app.core.enums import TaskType
+        return [t for t in self.tasks if t.task_type == TaskType.COMPLETED]
+
+    @property
+    def tasks_planned(self) -> list["ReportTask"]:
+        from app.core.enums import TaskType
+        return [t for t in self.tasks if t.task_type == TaskType.PLANNED]
+
     def __repr__(self) -> str:
         return (
             f"<WeeklyReport(id={self.id}, user_id={self.user_id}, "

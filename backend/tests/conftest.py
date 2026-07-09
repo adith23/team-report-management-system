@@ -52,17 +52,16 @@ def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
 
 
 # ── Database Schema Setup ────────────────────────────────────────
-@pytest_asyncio.fixture(scope="session", autouse=True)
+@pytest_asyncio.fixture(autouse=True)
 async def initialize_db_schema() -> AsyncGenerator[None, None]:
     """
     Generate all tables before running tests.
     """
     async with test_engine.begin() as conn:
-        # Create all tables defined in app.models
+        await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
     yield
     async with test_engine.begin() as conn:
-        # Drop all tables after the test session concludes
         await conn.run_sync(Base.metadata.drop_all)
 
 
@@ -74,9 +73,11 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
     Rolls back any changes made during the test.
     """
     async with test_session_factory() as session:
-        async with session.begin():
+        await session.begin()
+        try:
             yield session
-        # Transaction is rolled back automatically outside the 'begin' context
+        finally:
+            await session.rollback()
 
 
 # ── Dependency Override ──────────────────────────────────────────
