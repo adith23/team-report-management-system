@@ -23,7 +23,7 @@ class GeminiStrategy(LLMStrategy):
         if self._api_key:
             genai.configure(api_key=self._api_key)
             # Use gemini-1.5-flash for fast, high-context structured processing
-            self._model = genai.GenerativeModel("gemini-2.5-flash")
+            self._model = genai.GenerativeModel("gemini-3.1-flash-lite")
         else:
             self._model = None
             logger.warning(
