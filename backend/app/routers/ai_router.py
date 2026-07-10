@@ -10,7 +10,8 @@ Access is restricted to Managers only.
 
 import logging
 from datetime import date
-from fastapi import APIRouter, Depends, Query, Body
+from fastapi import APIRouter, Depends, Query, Body, HTTPException, status
+from pydantic import BaseModel, Field
 
 from app.core import require_role
 from app.core.dependencies import get_ai_service
@@ -28,12 +29,31 @@ router = APIRouter(
 )
 
 
+class ChatMessage(BaseModel):
+    role: str = Field(..., description="Role of the message author: 'user' or 'assistant'")
+    content: str = Field(..., description="Text content of the message")
+
+
+class AIChatRequest(BaseModel):
+    message: str | None = Field(default=None, description="The message string to the assistant")
+    query: str | None = Field(default=None, description="Query string alias for backwards compatibility")
+    history: list[ChatMessage] | None = Field(default=None, description="Optional conversation history")
+
+    @property
+    def prompt_text(self) -> str:
+        """Extract the query text from whichever field is populated."""
+        val = self.message or self.query
+        if not val:
+            raise ValueError("Either 'message' or 'query' must be provided in the request body.")
+        return val
+
+
 @router.post(
     "/chat",
     summary="Ask questions about recent team reports (MANAGER only)",
 )
 async def chat(
-    query: str = Body(..., embed=True, description="The query string to the assistant"),
+    payload: AIChatRequest = Body(...),
     current_user: User = Depends(require_role(UserRole.MANAGER)),
     ai_service: AIService = Depends(get_ai_service),
 ) -> dict[str, str]:
@@ -41,7 +61,15 @@ async def chat(
     Interact with the AI assistant.
     The assistant analyzes recent report submissions as context to answer.
     """
-    response_text = await ai_service.chat(query, manager=current_user)
+    try:
+        query_text = payload.prompt_text
+    except ValueError as val_err:
+        raise HTTPException(
+            status_code=status.HTTP_420_METHOD_FAILURE,
+            detail=str(val_err)
+        )
+    
+    response_text = await ai_service.chat(query_text, manager=current_user)
     return {"response": response_text}
 
 

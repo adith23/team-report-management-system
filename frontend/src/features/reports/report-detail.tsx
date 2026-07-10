@@ -17,7 +17,7 @@ import {
   Clock,
   BookOpen,
 } from "lucide-react";
-import { useReport, useSubmitReport, useUpdateReport } from "@/hooks/use-reports";
+import { useReport, useSubmitReport } from "@/hooks/use-reports";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -37,7 +37,6 @@ export function ReportDetail({ reportId }: ReportDetailProps) {
   const { data: report, isLoading, isError, refetch } = useReport(reportId);
 
   const submitMutation = useSubmitReport();
-  const updateMutation = useUpdateReport(reportId);
 
   const handleSubmitting = () => {
     submitMutation.mutate(reportId, {
@@ -53,24 +52,7 @@ export function ReportDetail({ reportId }: ReportDetailProps) {
 
   const handleEditClick = () => {
     if (!report) return;
-
-    if (report.status === ReportStatus.SUBMITTED || report.status === ReportStatus.LATE) {
-      // Re-opening submitted report back to draft
-      updateMutation.mutate(
-        { status: ReportStatus.DRAFT },
-        {
-          onSuccess: () => {
-            toast.info("Report status changed to Draft. You can now edit.");
-            router.push(ROUTES.REPORT_EDIT(reportId));
-          },
-          onError: (err) => {
-            toast.error(err.message || "Failed to edit report.");
-          },
-        }
-      );
-    } else {
-      router.push(ROUTES.REPORT_EDIT(reportId));
-    }
+    router.push(ROUTES.REPORT_EDIT(reportId));
   };
 
   if (isLoading) {
@@ -87,7 +69,7 @@ export function ReportDetail({ reportId }: ReportDetailProps) {
         <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
         <h3 className="text-lg font-semibold">Report Not Found</h3>
         <p className="text-sm text-[hsl(var(--muted-foreground))] mt-1">
-          The requested report doesn't exist or you don't have access.
+          {"The requested report doesn't exist or you don't have access."}
         </p>
         <Link href={ROUTES.REPORTS} className="mt-6 inline-block">
           <Button variant="secondary">Back to Reports</Button>
@@ -96,45 +78,49 @@ export function ReportDetail({ reportId }: ReportDetailProps) {
     );
   }
 
-  const isPendingActions = submitMutation.isPending || updateMutation.isPending;
+  const isPendingActions = submitMutation.isPending;
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12">
-      {/* Back navigation */}
+      {/* Top Header / Breadcrumbs */}
       <div className="flex items-center justify-between">
-        <Link href={ROUTES.REPORTS}>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Reports
-          </Button>
-        </Link>
+        <div>
+          <nav className="text-xs font-medium text-slate-500 flex items-center gap-1.5">
+            <span>Member Workspace</span>
+            <span>/</span>
+            <Link
+              href={ROUTES.REPORTS}
+              className="hover:text-slate-300 transition-colors"
+            >
+              Weekly Reports
+            </Link>
+            <span>/</span>
+            <span className="text-slate-300">Detail</span>
+          </nav>
+        </div>
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2">
           <Button
             variant="secondary"
-            size="sm"
             onClick={handleEditClick}
             disabled={isPendingActions}
-            className="flex items-center gap-1.5"
+            className="bg-transparent border border-[#2c2d3c] hover:bg-slate-800 text-slate-300 hover:text-white text-xs px-3 py-1.5 h-8 rounded-lg cursor-pointer transition-colors flex items-center gap-1.5"
           >
-            <Edit3 className="h-4 w-4" />
-            {report.status === ReportStatus.DRAFT ? "Edit Draft" : "Re-open & Edit"}
+            <Edit3 className="h-3.5 w-3.5" />
+            {report.status === ReportStatus.DRAFT
+              ? "Edit Draft"
+              : "Re-open & Edit"}
           </Button>
 
           {report.status === ReportStatus.DRAFT && (
             <Button
               variant="primary"
-              size="sm"
               onClick={handleSubmitting}
               loading={isPendingActions}
-              className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white"
+              className="bg-[#5c59f0] hover:bg-[#4b48d9] text-white text-xs px-3 py-1.5 h-8 rounded-lg transition-colors flex items-center gap-1.5 shadow-md"
             >
-              <Send className="h-4 w-4" />
+              <Send className="h-3.5 w-3.5" />
               Submit Report
             </Button>
           )}
@@ -155,8 +141,12 @@ export function ReportDetail({ reportId }: ReportDetailProps) {
             <Calendar className="h-5 w-5 text-indigo-600" />
           </div>
           <div>
-            <p className="text-xs text-[hsl(var(--muted-foreground))]">Project / Category</p>
-            <h4 className="font-semibold text-sm mt-0.5">{report.project_name || "Uncategorized"}</h4>
+            <p className="text-xs text-[hsl(var(--muted-foreground))]">
+              Project / Category
+            </p>
+            <h4 className="font-semibold text-sm mt-0.5">
+              {report.project_name || "Uncategorized"}
+            </h4>
           </div>
         </Card>
 
@@ -165,9 +155,13 @@ export function ReportDetail({ reportId }: ReportDetailProps) {
             <Clock className="h-5 w-5 text-emerald-600" />
           </div>
           <div>
-            <p className="text-xs text-[hsl(var(--muted-foreground))]">Hours Logged</p>
+            <p className="text-xs text-[hsl(var(--muted-foreground))]">
+              Hours Logged
+            </p>
             <h4 className="font-semibold text-sm mt-0.5">
-              {report.hours_worked !== null ? `${report.hours_worked} hours` : "None recorded"}
+              {report.hours_worked !== null
+                ? `${report.hours_worked} hours`
+                : "None recorded"}
             </h4>
           </div>
         </Card>
@@ -177,9 +171,13 @@ export function ReportDetail({ reportId }: ReportDetailProps) {
             <CheckCircle className="h-5 w-5 text-amber-600" />
           </div>
           <div>
-            <p className="text-xs text-[hsl(var(--muted-foreground))]">Submission Status</p>
+            <p className="text-xs text-[hsl(var(--muted-foreground))]">
+              Submission Status
+            </p>
             <h4 className="font-semibold text-sm mt-0.5">
-              {report.submitted_at ? `Submitted on ${formatDate(report.submitted_at)}` : "Not submitted yet"}
+              {report.submitted_at
+                ? `Submitted on ${formatDate(report.submitted_at)}`
+                : "Not submitted yet"}
             </h4>
           </div>
         </Card>
@@ -197,7 +195,9 @@ export function ReportDetail({ reportId }: ReportDetailProps) {
           </CardHeader>
           <CardContent className="p-6">
             {report.tasks_completed.length === 0 ? (
-              <p className="text-sm text-[hsl(var(--muted-foreground))]">No completed tasks recorded.</p>
+              <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                No completed tasks recorded.
+              </p>
             ) : (
               <ul className="space-y-3">
                 {report.tasks_completed.map((task, idx) => (
@@ -205,7 +205,9 @@ export function ReportDetail({ reportId }: ReportDetailProps) {
                     <span className="text-xs font-semibold text-[hsl(var(--muted-foreground))] w-5 text-right mt-0.5 shrink-0">
                       {idx + 1}.
                     </span>
-                    <span className="text-[hsl(var(--foreground))]">{task.description}</span>
+                    <span className="text-[hsl(var(--foreground))]">
+                      {task.description}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -223,7 +225,9 @@ export function ReportDetail({ reportId }: ReportDetailProps) {
           </CardHeader>
           <CardContent className="p-6">
             {report.tasks_planned.length === 0 ? (
-              <p className="text-sm text-[hsl(var(--muted-foreground))]">No planned tasks recorded.</p>
+              <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                No planned tasks recorded.
+              </p>
             ) : (
               <ul className="space-y-3">
                 {report.tasks_planned.map((task, idx) => (
@@ -231,7 +235,9 @@ export function ReportDetail({ reportId }: ReportDetailProps) {
                     <span className="text-xs font-semibold text-[hsl(var(--muted-foreground))] w-5 text-right mt-0.5 shrink-0">
                       {idx + 1}.
                     </span>
-                    <span className="text-[hsl(var(--foreground))]">{task.description}</span>
+                    <span className="text-[hsl(var(--foreground))]">
+                      {task.description}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -249,7 +255,9 @@ export function ReportDetail({ reportId }: ReportDetailProps) {
           </CardHeader>
           <CardContent className="p-6">
             {report.blockers.length === 0 ? (
-              <p className="text-sm text-[hsl(var(--muted-foreground))]">No blockers recorded this week.</p>
+              <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                No blockers recorded this week.
+              </p>
             ) : (
               <ul className="space-y-3">
                 {report.blockers.map((blocker, idx) => (

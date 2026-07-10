@@ -16,7 +16,7 @@ only SQLAlchemy models can be used.
 import uuid
 from typing import Generic, TypeVar, Type, Sequence
 
-from sqlalchemy import select, func
+from sqlalchemy import select, func, inspect
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.base import Base
@@ -109,7 +109,10 @@ class BaseRepository(Generic[ModelType]):
         """
         self._session.add(obj)
         await self._session.flush()
-        await self._session.refresh(obj)
+        # Refresh only column attributes to avoid expiring lazy='raise' relationships
+        mapper = inspect(obj.__class__)
+        columns = [c.key for c in mapper.column_attrs]
+        await self._session.refresh(obj, attribute_names=columns)
         return obj
 
     async def update(self, obj: ModelType, data: dict) -> ModelType:
@@ -130,7 +133,10 @@ class BaseRepository(Generic[ModelType]):
             if hasattr(obj, key):
                 setattr(obj, key, value)
         await self._session.flush()
-        await self._session.refresh(obj)
+        # Refresh only column attributes to avoid expiring lazy='raise' relationships
+        mapper = inspect(obj.__class__)
+        columns = [c.key for c in mapper.column_attrs]
+        await self._session.refresh(obj, attribute_names=columns)
         return obj
 
     async def delete(self, obj: ModelType) -> None:

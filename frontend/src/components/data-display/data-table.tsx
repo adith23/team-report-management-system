@@ -145,7 +145,7 @@ export function DataTable<T extends Record<string, unknown>>({
 
   if (loading) {
     return (
-      <div className={cn("overflow-x-auto rounded-xl border border-[hsl(var(--border))]", className)}>
+      <div className={cn("overflow-x-auto rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))]", className)}>
         <table className="w-full">
           <thead>
             <tr className="border-b border-[hsl(var(--border))] bg-[hsl(var(--muted)/0.5)]">
@@ -193,7 +193,7 @@ export function DataTable<T extends Record<string, unknown>>({
   // ── Table ────────────────────────────────────────────────────────────────
 
   return (
-    <div className={cn("overflow-x-auto rounded-xl border border-[hsl(var(--border))]", className)}>
+    <div className={cn("overflow-x-auto rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))]", className)}>
       <table className="w-full">
         <thead>
           <tr className="border-b border-[hsl(var(--border))] bg-[hsl(var(--muted)/0.5)]">

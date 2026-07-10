@@ -8,7 +8,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { Plus, FileText } from "lucide-react";
 import { useMyReports } from "@/hooks/use-reports";
-import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { SkeletonCard } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/data-display/empty-state";
@@ -24,23 +23,32 @@ export function ReportListPage() {
     setPage(newPage);
   };
 
-  // Header actions slot
-  const headerAction = (
-    <Link href={ROUTES.NEW_REPORT}>
-      <Button variant="primary" size="md">
-        <Plus className="h-4 w-4 shrink-0" />
-        New Report
-      </Button>
-    </Link>
-  );
-
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="My Reports"
-        subtitle="Manage and track your weekly updates and tasks"
-        action={headerAction}
-      />
+      {/* Top Header / Breadcrumbs */}
+      <div className="flex items-center justify-between">
+        <div>
+          <nav className="text-xs font-medium text-slate-500 flex items-center gap-1.5">
+            <span>Member Workspace</span>
+            <span>/</span>
+            <span className="text-slate-300">Weekly Reports</span>
+          </nav>
+        </div>
+        <Link
+          href={ROUTES.NEW_REPORT}
+          className="inline-flex items-center gap-1 bg-[#5c59f0] hover:bg-[#4b48d9] text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors shadow-md h-8"
+        >
+          <Plus className="h-3.5 w-3.5" />
+          New Report
+        </Link>
+      </div>
+
+      {/* Page Title Section Divider */}
+      <div className="flex items-center justify-between border-b border-[#21222d] pb-4">
+        <h2 className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+          My Weekly Reports
+        </h2>
+      </div>
 
       {/* Loading Skeleton state */}
       {isLoading && (
@@ -57,7 +65,11 @@ export function ReportListPage() {
           title="Failed to load reports"
           description="There was an error communicating with the server. Please try refreshing."
           action={
-            <Button variant="secondary" onClick={() => window.location.reload()}>
+            <Button
+              variant="secondary"
+              onClick={() => window.location.reload()}
+              className="bg-transparent border border-[#2c2d3c] text-slate-300 text-xs px-3 py-1.5 h-8 rounded-lg cursor-pointer hover:bg-slate-800 hover:text-white"
+            >
               Refresh Page
             </Button>
           }
@@ -71,8 +83,11 @@ export function ReportListPage() {
           description="Create your first weekly report to log tasks completed, planned tasks, and blockers."
           icon={FileText}
           action={
-            <Link href={ROUTES.NEW_REPORT}>
-              <Button variant="primary">Create Report</Button>
+            <Link
+              href={ROUTES.NEW_REPORT}
+              className="inline-flex items-center gap-1 bg-[#5c59f0] hover:bg-[#4b48d9] text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors shadow-md"
+            >
+              Create Report
             </Link>
           }
         />
@@ -89,7 +104,7 @@ export function ReportListPage() {
 
           {/* Pagination Controls */}
           {data.total_pages > 1 && (
-            <div className="flex justify-center border-t border-[hsl(var(--border))] pt-6 mt-6">
+            <div className="flex justify-center border-t border-[#21222d] pt-6 mt-6">
               <Pagination
                 page={page}
                 totalPages={data.total_pages}

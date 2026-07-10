@@ -122,24 +122,24 @@ class WeeklyReport(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     user: Mapped["User"] = relationship(
         "User",
         back_populates="reports",
-        lazy="selectin",
+        lazy="raise",
     )
     project: Mapped["Project"] = relationship(
         "Project",
         back_populates="reports",
-        lazy="selectin",
+        lazy="raise",
     )
     tasks: Mapped[list["ReportTask"]] = relationship(
         "ReportTask",
         back_populates="report",
-        lazy="selectin",
+        lazy="raise",
         cascade="all, delete-orphan",
         order_by="ReportTask.sort_order",
     )
     blockers: Mapped[list["ReportBlocker"]] = relationship(
         "ReportBlocker",
         back_populates="report",
-        lazy="selectin",
+        lazy="raise",
         cascade="all, delete-orphan",
         order_by="ReportBlocker.sort_order",
     )

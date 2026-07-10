@@ -19,6 +19,7 @@ export function useUsers(page: number = 1, pageSize: number = DEFAULT_PAGE_SIZE)
         page,
         page_size: pageSize,
       }),
+    staleTime: 2 * 60 * 1000, // Cache for 2 minutes to prevent duplicate list requests
   });
 }
 

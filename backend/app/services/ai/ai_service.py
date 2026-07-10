@@ -2,31 +2,38 @@
 AI Team Assistant service.
 
 Uses the strategy pattern to interact with LLMs.
+Uses VectorService to implement a production-grade RAG pipeline.
 Provides:
 - Team summary generator: aggregates submitted reports for a week and creates a summary.
-- Interactive Chat: parses recent team reports as context to answer manager queries.
+- RAG Conversational Chat: queries the Pinecone vector database for relevant report context.
 """
 
 import logging
 from datetime import date, timedelta
-import uuid
 
 from app.core.enums import ReportStatus
 from app.models.user import User
 from app.repositories.report_repository import ReportRepository
 from app.services.ai.llm_strategy import LLMStrategy
+from app.services.ai.vector_service import VectorService
 
 logger = logging.getLogger(__name__)
 
 
 class AIService:
     """
-    Orchestrates LLM strategies and report context to answer queries.
+    Orchestrates LLM strategies and vector report context to answer queries.
     """
 
-    def __init__(self, llm: LLMStrategy, report_repo: ReportRepository) -> None:
+    def __init__(
+        self,
+        llm: LLMStrategy,
+        report_repo: ReportRepository,
+        vector_service: VectorService,
+    ) -> None:
         self._llm = llm
         self._report_repo = report_repo
+        self._vector_service = vector_service
 
     def _format_reports_for_llm(self, reports) -> str:
         """
@@ -43,7 +50,7 @@ class AIService:
             formatted_lines.append(f"- **Hours Worked:** {r.hours_worked if r.hours_worked is not None else 'N/A'}")
             
             # Tasks Completed
-            completed_tasks = [t.description for t in r.tasks if t.task_type == "COMPLETED"]
+            completed_tasks = [t.description for t in r.tasks if t.task_type.value == "COMPLETED" or t.task_type == "COMPLETED"]
             formatted_lines.append("  - **Completed Tasks:**")
             if completed_tasks:
                 for t in completed_tasks:
@@ -52,7 +59,7 @@ class AIService:
                 formatted_lines.append("    - None reported")
 
             # Tasks Planned
-            planned_tasks = [t.description for t in r.tasks if t.task_type == "PLANNED"]
+            planned_tasks = [t.description for t in r.tasks if t.task_type.value == "PLANNED" or t.task_type == "PLANNED"]
             formatted_lines.append("  - **Planned Tasks:**")
             if planned_tasks:
                 for t in planned_tasks:
@@ -103,7 +110,7 @@ class AIService:
             "1. **Executive Overview**: A 3-4 sentence high-level summary of the week's overall progress.\n"
             "2. **Completed Milestones by Project**: Group completed tasks by project category and summarize key accomplishments.\n"
             "3. **Blockers & Risk Analysis**: List all UNRESOLVED blockers, who is impacted, and potential risks to timelines.\n"
-            "4. **Resource Allocation & Hours**: A brief analysis of workload distribution and hours worked.\n"
+            "4. **Resource Allocation & Hours**: A brief summary of workload distribution and hours worked.\n"
             "5. **Upcoming Plans**: Key objectives and planned tasks for next week.\n\n"
             "Keep the tone professional, objective, and action-oriented. Use clear markdown formatting."
         )
@@ -119,33 +126,49 @@ class AIService:
 
     async def chat(self, query: str, manager: User) -> str:
         """
-        Answer questions about team reports using recent submissions as context.
+        Answer questions about team reports using RAG semantic retrieval from VectorService.
         """
-        # Fetch the most recent 60 submitted reports for team context
-        reports, _ = await self._report_repo.get_team_reports(
-            status=None,  # Include submitted/late, ignore draft if desired or fetch all
-            limit=60,
-        )
-
-        # Filter out drafts
-        submitted_reports = [r for r in reports if r.status != ReportStatus.DRAFT]
-
-        context_data = self._format_reports_for_llm(submitted_reports)
+        # 1. Retrieve semantically matching reports from Pinecone / Local cache
+        similar_docs = await self._vector_service.query_similar(query, limit=8)
+        
+        if similar_docs:
+            # Construct context from semantic matches
+            context_blocks = []
+            for doc in similar_docs:
+                meta = doc["metadata"]
+                context_blocks.append(
+                    f"--- SEMANTIC MATCH (Report ID: {doc['id']}, Score: {doc.get('score', 1.0):.2f}) ---\n"
+                    f"Report author: {meta.get('user_name', 'Unknown')}\n"
+                    f"Project category: {meta.get('project_name', 'Uncategorized')}\n"
+                    f"Week starting: {meta.get('week_start', '')}\n"
+                    f"Content:\n{doc['text']}\n"
+                )
+            context_data = "\n".join(context_blocks)
+            logger.info("RAG Context generated from %s semantic vector matches", len(similar_docs))
+        else:
+            # 2. Database Fallback (if vector cache is clean or Pinecone is not indexing yet)
+            logger.warning("RAG vector index returned no matches. Falling back to direct database retrieval.")
+            reports, _ = await self._report_repo.get_team_reports(
+                status=None,
+                limit=30,
+            )
+            submitted_reports = [r for r in reports if r.status != ReportStatus.DRAFT]
+            context_data = self._format_reports_for_llm(submitted_reports)
 
         system_prompt = (
             "You are 'Antigravity AI Assistant', an expert team coordination assistant.\n"
             "You help managers analyze team reports, task items, workload, and blocker metrics.\n\n"
             "Guidelines:\n"
-            "- You have access to recent report submissions from the team in the context below.\n"
+            "- You have access to recent report submissions from the team in the RAG context below.\n"
             "- Answer the user's question accurately, citing specific team members or projects where relevant.\n"
             "- Keep answers concise, factual, and formatted in clear markdown.\n"
             "- If the query asks about information not present in the provided reports, "
             "politely state that the current reports do not contain that information.\n"
-            "- Never disclose password hashes or personal auth details (even if mock data has them)."
+            "- Never disclose password hashes or personal auth details."
         )
 
         user_message = (
-            f"Here is the context of recent team reports:\n\n"
+            f"Here is the context of recent team reports retrieved for this query:\n\n"
             f"{context_data}\n\n"
             f"User Query: {query}\n\n"
             f"Please answer the query using the context above."

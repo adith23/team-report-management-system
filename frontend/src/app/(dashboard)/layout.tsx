@@ -31,14 +31,14 @@ export default function DashboardLayout({
         <div
           className={cn(
             "flex flex-1 flex-col overflow-hidden transition-all duration-300",
-            sidebarCollapsed ? "lg:pl-20" : "lg:pl-64"
+            sidebarCollapsed ? "lg:pl-20" : "lg:pl-64",
           )}
         >
           {/* Sticky Header */}
           <Header />
 
           {/* Page body content */}
-          <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50/50 dark:bg-slate-900/10">
+          <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-[hsl(var(--background))] animate-fade-in">
             {children}
           </main>
         </div>

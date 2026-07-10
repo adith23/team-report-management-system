@@ -38,6 +38,7 @@ router = APIRouter(prefix="/reports", tags=["Weekly Reports"])
 )
 async def create_report(
     data: ReportCreate,
+    submit: bool = Query(default=False, description="If True, immediately submit the created report"),
     current_user: User = Depends(get_current_user),
     report_service: ReportService = Depends(get_report_service),
 ) -> ReportRead:
@@ -46,6 +47,8 @@ async def create_report(
     The report date is snapped to Monday-Sunday week boundaries by the service layer.
     """
     report = await report_service.create_report(data, author=current_user)
+    if submit:
+        report = await report_service.submit_report(report.id, current_user=current_user)
     return ReportRead.model_validate(report)
 
 
@@ -127,6 +130,7 @@ async def get_report_detail(
 async def update_report(
     report_id: uuid.UUID,
     data: ReportUpdate,
+    submit: bool = Query(default=False, description="If True, immediately submit the updated report"),
     current_user: User = Depends(get_current_user),
     report_service: ReportService = Depends(get_report_service),
 ) -> ReportRead:
@@ -136,6 +140,8 @@ async def update_report(
     back to DRAFT, requiring resubmission to preserve workflow integrity.
     """
     report = await report_service.update_report(report_id, data, current_user=current_user)
+    if submit:
+        report = await report_service.submit_report(report_id, current_user=current_user)
     return ReportRead.model_validate(report)
 
 

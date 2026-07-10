@@ -1,75 +1,137 @@
 // ──────────────────────────────────────────────────────────────────────────────
-// ActivityFeed — Displays team activity logs and timelines
+// ActivityFeed — Displays team activity logs and timelines matching mockup UI
 // ──────────────────────────────────────────────────────────────────────────────
 
 "use client";
 
 import { useRecentActivity } from "@/hooks/use-dashboard";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Avatar } from "@/components/ui/avatar";
 import { Spinner } from "@/components/ui/spinner";
 import { formatRelativeTime } from "@/lib/utils";
-import { FileText, Plus, FileEdit } from "lucide-react";
+import type { Report } from "@/types";
 
-export function ActivityFeed() {
+interface ActivityFeedProps {
+  reports: Report[];
+}
+
+const getAvatarBg = (name: string) => {
+  const colors = [
+    "bg-[#5c59f0]", // Purple-Blue
+    "bg-[#3b82f6]", // Blue
+    "bg-[#8b5cf6]", // Purple
+    "bg-[#06b6d4]", // Cyan
+    "bg-[#ec4899]", // Pink
+  ];
+  let sum = 0;
+  for (let i = 0; i < name.length; sum += name.charCodeAt(i++));
+  return colors[sum % colors.length];
+};
+
+const getInitials = (name: string) => {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .substring(0, 2)
+    .toUpperCase();
+};
+
+export function ActivityFeed({ reports }: ActivityFeedProps) {
   const { data: feed, isLoading } = useRecentActivity();
 
   return (
-    <Card className="flex flex-col h-[400px]">
-      <CardHeader className="border-b border-[hsl(var(--border))] pb-4">
-        <CardTitle className="text-sm font-semibold uppercase tracking-wider text-[hsl(var(--muted-foreground))]">
-          Recent Activity
+    <Card className="flex flex-col bg-[#15161e] border border-[#21222d] rounded-2xl overflow-hidden">
+      <CardHeader className="px-6 py-4 border-b border-[#21222d]">
+        <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-400">
+          Recent Activity Feed
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="flex-1 overflow-y-auto p-0">
+      <CardContent className="p-6">
         {isLoading ? (
-          <div className="flex h-48 items-center justify-center">
+          <div className="py-8 flex justify-center">
             <Spinner />
           </div>
         ) : !feed || feed.length === 0 ? (
-          <div className="p-6 text-center text-sm text-[hsl(var(--muted-foreground))]">
+          <div className="text-center text-sm text-slate-500 py-4">
             No recent activity recorded.
           </div>
         ) : (
-          <div className="p-4 space-y-4">
-            {feed.map((activity, idx) => (
-              <div key={activity.report_id + idx} className="flex gap-3 text-sm">
-                <Avatar name={activity.user_full_name} size="sm" className="shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-[hsl(var(--foreground))] text-xs md:text-sm">
-                    <span className="font-semibold">{activity.user_full_name}</span>{" "}
-                    {activity.action === "submitted" && "submitted a report for"}
-                    {activity.action === "created" && "created a draft for"}
-                    {activity.action === "updated" && "updated a draft for"}{" "}
-                    <span className="font-semibold text-indigo-600 dark:text-indigo-400">
-                      {activity.project_name}
-                    </span>
-                  </p>
-                  <p className="text-xs text-[hsl(var(--muted-foreground))] mt-1">
-                    {formatRelativeTime(activity.timestamp)}
-                  </p>
-                </div>
+          <div className="space-y-6">
+            {feed.map((activity, idx) => {
+              // Find hours if available in current reports
+              const matchingReport = reports.find(
+                (r) =>
+                  r.user_full_name === activity.user_full_name &&
+                  r.project_name === activity.project_name
+              );
+              const hours = matchingReport?.hours_worked;
+              const isSubmitted = activity.action === "submitted";
 
-                <div className="shrink-0">
-                  {activity.action === "submitted" && (
-                    <div className="h-7 w-7 rounded-full bg-green-500/10 flex items-center justify-center">
-                      <FileText className="h-3.5 w-3.5 text-green-600" />
+              // Formatting box details
+              let detailsText = `Project: ${activity.project_name}`;
+              if (isSubmitted && hours !== undefined && hours !== null) {
+                detailsText = `Project: ${activity.project_name} (${hours} hrs)`;
+              }
+
+              // Determine Action Verb description text
+              let actionVerb = "updated draft report";
+              let verbMuted = true;
+
+              if (activity.action === "submitted") {
+                actionVerb = "submitted weekly report";
+                verbMuted = false;
+              } else if (activity.action === "created") {
+                actionVerb = "created draft report";
+                verbMuted = true;
+              } else if (activity.action === "updated") {
+                actionVerb = "saved draft report";
+                verbMuted = true;
+              }
+
+              // If action is anything else (e.g. customized statuses in future backend)
+              const actionLabel = activity.action as string;
+              if (actionLabel.includes("promote") || actionLabel.includes("status")) {
+                actionVerb = actionLabel;
+                verbMuted = false;
+                detailsText = activity.project_name;
+              }
+
+              return (
+                <div key={activity.report_id + idx} className="flex gap-4 items-start">
+                  {/* Circular initials avatar */}
+                  <div
+                    className={`h-8 w-8 rounded-full ${getAvatarBg(
+                      activity.user_full_name
+                    )} flex items-center justify-center text-[10px] font-bold text-white shrink-0`}
+                  >
+                    {getInitials(activity.user_full_name)}
+                  </div>
+
+                  {/* Body Content */}
+                  <div className="flex-1 min-w-0 space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-xs text-slate-200">
+                        <span className="font-semibold text-slate-100 mr-1">
+                          {activity.user_full_name}
+                        </span>
+                        <span className={verbMuted ? "text-slate-400 font-medium" : "text-slate-100 font-semibold"}>
+                          {actionVerb}
+                        </span>
+                      </p>
+                      <span className="text-[10px] text-slate-500 font-medium shrink-0">
+                        {formatRelativeTime(activity.timestamp)}
+                      </span>
                     </div>
-                  )}
-                  {activity.action === "created" && (
-                    <div className="h-7 w-7 rounded-full bg-blue-500/10 flex items-center justify-center">
-                      <Plus className="h-3.5 w-3.5 text-blue-600" />
+
+                    {/* Details Box */}
+                    <div className="bg-[#1c1d26] border border-[#2c2d3c] rounded-xl px-4 py-2 text-[10px] font-medium text-slate-400 max-w-max">
+                      {detailsText}
                     </div>
-                  )}
-                  {activity.action === "updated" && (
-                    <div className="h-7 w-7 rounded-full bg-yellow-500/10 flex items-center justify-center">
-                      <FileEdit className="h-3.5 w-3.5 text-yellow-600" />
-                    </div>
-                  )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </CardContent>

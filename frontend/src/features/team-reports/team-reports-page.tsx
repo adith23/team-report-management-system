@@ -6,14 +6,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Filter, RotateCcw, FileText } from "lucide-react";
+import { Plus, FileText } from "lucide-react";
+import { startOfWeek, endOfWeek, format, subWeeks } from "date-fns";
 import { useTeamReports } from "@/hooks/use-reports";
 import { useUsers } from "@/hooks/use-users";
 import { useProjects } from "@/hooks/use-projects";
-import { PageHeader } from "@/components/layout/page-header";
-import { Button } from "@/components/ui/button";
-import { Select } from "@/components/ui/select";
-import { WeekPicker } from "@/components/forms/week-picker";
 import { ReportCard } from "@/features/reports/report-card";
 import { SkeletonCard } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/data-display/empty-state";
@@ -40,7 +37,7 @@ export function TeamReportsPage() {
     project_id: selectedProjectId || undefined,
     status: (selectedStatus as ReportStatus) || undefined,
     page,
-    page_size: 10,
+    page_size: 9, // Multiple of 3 looks best in a 3-column grid
   };
 
   const { data: teamReports, isLoading, isError } = useTeamReports(filters);
@@ -54,105 +51,130 @@ export function TeamReportsPage() {
     setPage(1);
   };
 
-  // Dropdown option maps
-  const userOptions =
-    usersData?.items.map((u) => ({
-      value: u.id,
-      label: u.full_name,
-    })) || [];
+  // Generate week choices for the active filters dropdown
+  const weekOptions = (() => {
+    const options = [];
+    const today = new Date();
+    const currentMonday = startOfWeek(today, { weekStartsOn: 1 });
+    for (let i = 0; i < 8; i++) {
+      const monday = subWeeks(currentMonday, i);
+      const sunday = endOfWeek(monday, { weekStartsOn: 1 });
+      const isoString = format(monday, "yyyy-MM-dd");
+      const label = `${format(monday, "MMM d")} - ${format(sunday, "MMM d, yyyy")}`;
+      options.push({ value: isoString, label });
+    }
+    return options;
+  })();
 
-  const projectOptions =
-    projectsData?.map((p) => ({
-      value: p.id,
-      label: p.name,
-    })) || [];
-
-  const statusOptions = [
-    { value: ReportStatus.DRAFT, label: "Draft" },
-    { value: ReportStatus.SUBMITTED, label: "Submitted" },
-    { value: ReportStatus.LATE, label: "Late" },
-  ];
+  const activeUsers = usersData?.items || [];
+  const projects = projectsData || [];
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
-      <PageHeader
-        title="Team Reports"
-        subtitle="Review, audit, and track weekly reports submitted by your team members."
-      />
-
-      {/* Filter panel */}
-      <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-5 space-y-4 shadow-sm">
-        <div className="flex items-center gap-2 text-sm font-semibold text-[hsl(var(--foreground))]">
-          <Filter className="h-4 w-4 text-indigo-600" />
-          <span>Search Filters</span>
+    <div className="min-h-screen bg-[#0d0e12] text-slate-100 p-6 space-y-6">
+      {/* Top Header / Breadcrumbs */}
+      <div className="flex items-center justify-between">
+        <div>
+          <nav className="text-xs font-medium text-slate-500 flex items-center gap-1.5">
+            <span>Member Workspace</span>
+            <span>/</span>
+            <span className="text-slate-300">Team Reports</span>
+          </nav>
         </div>
+        <Link
+          href="/reports/new"
+          className="inline-flex items-center gap-1 bg-[#5c59f0] hover:bg-[#4b48d9] text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors shadow-md h-8"
+        >
+          <Plus className="h-3.5 w-3.5" />
+          Submit Report
+        </Link>
+      </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-          {/* Week Picker Filter */}
-          <div className="space-y-1.5">
-            <span className="block text-sm font-medium text-[hsl(var(--foreground))]">
-              Select Week
-            </span>
-            <WeekPicker
-              value={weekStart}
-              onChange={(val) => {
-                setWeekStart(val);
-                setPage(1);
-              }}
-              allowFuture
-              className="w-full"
-            />
-          </div>
+      {/* ACTIVE FILTERS Bar */}
+      <div className="bg-[#15161e] border border-[#21222d] rounded-xl px-4 py-3 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase shrink-0">
+            Active Filters:
+          </span>
 
-          {/* Member Dropdown */}
-          <Select
-            label="Team Member"
-            placeholder="All Members"
-            options={userOptions}
+          {/* Week Dropdown */}
+          <select
+            value={weekStart}
+            onChange={(e) => {
+              setWeekStart(e.target.value);
+              setPage(1);
+            }}
+            className="bg-[#1c1d26] border border-[#2c2d3c] text-white text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer min-w-[180px]"
+          >
+            {weekOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+
+          {/* Members Dropdown */}
+          <select
             value={selectedUserId}
             onChange={(e) => {
               setSelectedUserId(e.target.value);
               setPage(1);
             }}
-          />
+            className="bg-[#1c1d26] border border-[#2c2d3c] text-white text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer min-w-[140px]"
+          >
+            <option value="">All Members</option>
+            {activeUsers.map((u) => (
+              <option key={u.id} value={u.id}>
+                {u.full_name}
+              </option>
+            ))}
+          </select>
 
-          {/* Project Dropdown */}
-          <Select
-            label="Project"
-            placeholder="All Projects"
-            options={projectOptions}
+          {/* Projects Dropdown */}
+          <select
             value={selectedProjectId}
             onChange={(e) => {
               setSelectedProjectId(e.target.value);
               setPage(1);
             }}
-          />
+            className="bg-[#1c1d26] border border-[#2c2d3c] text-white text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer min-w-[140px]"
+          >
+            <option value="">All Projects</option>
+            {projects.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
 
           {/* Status Dropdown */}
-          <Select
-            label="Report Status"
-            placeholder="All Statuses"
-            options={statusOptions}
+          <select
             value={selectedStatus}
             onChange={(e) => {
               setSelectedStatus(e.target.value);
               setPage(1);
             }}
-          />
+            className="bg-[#1c1d26] border border-[#2c2d3c] text-white text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer min-w-[120px]"
+          >
+            <option value="">All Statuses</option>
+            <option value={ReportStatus.DRAFT}>Draft</option>
+            <option value={ReportStatus.SUBMITTED}>Submitted</option>
+            <option value={ReportStatus.LATE}>Late</option>
+          </select>
         </div>
 
-        {/* Clear filter action */}
-        <div className="flex justify-end pt-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={handleClearFilters}
-            className="flex items-center gap-1.5"
-          >
-            <RotateCcw className="h-3.5 w-3.5" />
-            Clear Filters
-          </Button>
-        </div>
+        <button
+          onClick={handleClearFilters}
+          className="text-xs text-slate-400 hover:text-white font-medium transition-colors cursor-pointer"
+        >
+          Clear Filters
+        </button>
+      </div>
+
+      {/* Section Divider */}
+      <div className="flex items-center justify-between border-b border-[#21222d] pb-4">
+        <h2 className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+          Team Reports History
+        </h2>
       </div>
 
       {/* Grid of Results / Loading status */}
@@ -167,38 +189,43 @@ export function TeamReportsPage() {
       {!isLoading && isError && (
         <EmptyState
           title="Query Error"
-          description="Failed to load team reports. Please try adjusting your filters or reloading."
+          description="Failed to load team reports. Please try refreshing."
         />
       )}
 
-      {!isLoading && !isError && (!teamReports?.items || teamReports.items.length === 0) && (
-        <EmptyState
-          title="No reports match your filters"
-          description="Try selecting a different week range or changing member and project filters."
-          icon={FileText}
-        />
-      )}
+      {!isLoading &&
+        !isError &&
+        (!teamReports?.items || teamReports.items.length === 0) && (
+          <EmptyState
+            title="No reports match your filters"
+            description="Try selecting a different week range or changing member and project filters."
+            icon={FileText}
+          />
+        )}
 
-      {!isLoading && !isError && teamReports?.items && teamReports.items.length > 0 && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {teamReports.items.map((report) => (
-              <ReportCard key={report.id} report={report} />
-            ))}
-          </div>
-
-          {/* Pagination Controls */}
-          {teamReports.total_pages > 1 && (
-            <div className="flex justify-center border-t border-[hsl(var(--border))] pt-6 mt-6">
-              <Pagination
-                page={page}
-                totalPages={teamReports.total_pages}
-                onPageChange={setPage}
-              />
+      {!isLoading &&
+        !isError &&
+        teamReports?.items &&
+        teamReports.items.length > 0 && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {teamReports.items.map((report) => (
+                <ReportCard key={report.id} report={report} />
+              ))}
             </div>
-          )}
-        </div>
-      )}
+
+            {/* Pagination Controls */}
+            {teamReports.total_pages > 1 && (
+              <div className="flex justify-center border-t border-[#21222d] pt-6 mt-6">
+                <Pagination
+                  page={page}
+                  totalPages={teamReports.total_pages}
+                  onPageChange={setPage}
+                />
+              </div>
+            )}
+          </div>
+        )}
     </div>
   );
 }

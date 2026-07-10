@@ -4,7 +4,6 @@
 
 "use client";
 
-import { useState } from "react";
 import {
   ResponsiveContainer,
   LineChart,
@@ -16,115 +15,105 @@ import {
 } from "recharts";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useTasksTrend } from "@/hooks/use-dashboard";
-import { useUsers } from "@/hooks/use-users";
 import { formatWeekRange } from "@/lib/date-utils";
 import { Spinner } from "@/components/ui/spinner";
+import type { TaskTrendPoint } from "@/types";
 
-export function TasksTrendChart() {
-  const [selectedUserId, setSelectedUserId] = useState<string>("");
-  const { data: usersData } = useUsers(1, 100); // Fetch all users for dropdown
-  const { data: trendData, isLoading } = useTasksTrend(
-    12,
-    selectedUserId || undefined,
-  );
+interface TasksTrendChartProps {
+  selectedUserId?: string;
+}
 
-  // Format date ticks: "Jul 1"
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload as TaskTrendPoint;
+    return (
+      <div className="bg-[#1c1d26] border border-[#2c2d3c] p-3 rounded-lg shadow-lg text-xs space-y-1">
+        <p className="font-semibold text-slate-300">
+          Week of {formatWeekRange(data.week_start)}
+        </p>
+        <p className="text-[#5c59f0] font-medium">
+          Tasks Completed: {data.tasks_completed_count}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
+
+export function TasksTrendChart({ selectedUserId }: TasksTrendChartProps) {
+  const { data: trendData, isLoading } = useTasksTrend(6, selectedUserId || undefined);
+
+  // Format date ticks: "Jun 1"
   const formatXAxis = (tickItem: string) => {
     try {
       const date = new Date(tickItem);
-      return date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-      });
+      return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
     } catch {
       return tickItem;
     }
   };
 
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-[hsl(var(--card))] border border-[hsl(var(--border))] p-3 rounded-lg shadow-lg text-xs space-y-1">
-          <p className="font-semibold text-[hsl(var(--foreground))]">
-            Week of {formatWeekRange(data.week_start)}
-          </p>
-          <p className="text-indigo-600 dark:text-indigo-400 font-medium">
-            Tasks Completed: {data.tasks_completed_count}
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
-
   return (
-    <Card className="flex flex-col h-[400px]">
-      <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-[hsl(var(--border))]">
-        <CardTitle className="text-sm font-semibold uppercase tracking-wider text-[hsl(var(--muted-foreground))]">
-          Completed Tasks Trend (Last 12 Wks)
+    <Card className="flex flex-col h-[380px] bg-[#15161e] border border-[#21222d] rounded-2xl">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-400">
+          Tasks Completed Trend
         </CardTitle>
-
-        {/* Member filter dropdown */}
-        <select
-          value={selectedUserId}
-          onChange={(e) => setSelectedUserId(e.target.value)}
-          className="text-xs h-8 rounded-lg border border-[hsl(var(--input))] bg-transparent px-2 focus:outline-none focus:ring-1 focus:ring-[hsl(var(--ring))]"
-        >
-          <option value="">All Team Members</option>
-          {usersData?.items.map((user) => (
-            <option key={user.id} value={user.id}>
-              {user.full_name}
-            </option>
-          ))}
-        </select>
       </CardHeader>
 
-      <CardContent className="flex-1 min-h-0 p-6 flex items-center justify-center">
+      <CardContent className="flex-1 min-h-0 px-6 pb-6 flex items-center justify-center">
         {isLoading ? (
           <Spinner />
         ) : !trendData || trendData.length === 0 ? (
-          <p className="text-sm text-[hsl(var(--muted-foreground))]">
-            No trend data available.
-          </p>
+          <p className="text-sm text-slate-500">No trend data available.</p>
         ) : (
           <div className="w-full h-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 data={trendData}
-                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                margin={{ top: 25, right: 15, left: -25, bottom: 5 }}
               >
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  stroke="hsl(var(--border))"
+                  stroke="#21222d"
                   vertical={false}
                 />
                 <XAxis
                   dataKey="week_start"
                   tickFormatter={formatXAxis}
-                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
-                  stroke="hsl(var(--border))"
+                  tick={{ fill: "#64748b", fontSize: 9, fontWeight: 500 }}
+                  tickLine={false}
+                  stroke="#21222d"
                   dy={10}
                 />
                 <YAxis
                   allowDecimals={false}
-                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
-                  stroke="hsl(var(--border))"
+                  tick={{ fill: "#64748b", fontSize: 9, fontWeight: 500 }}
+                  tickLine={false}
+                  stroke="#21222d"
                   dx={-5}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Line
                   type="monotone"
                   dataKey="tasks_completed_count"
-                  stroke="hsl(var(--primary))"
-                  strokeWidth={2}
+                  stroke="#5c59f0"
+                  strokeWidth={2.5}
                   dot={{
                     r: 4,
-                    stroke: "hsl(var(--primary))",
-                    strokeWidth: 1,
-                    fill: "hsl(var(--card))",
+                    stroke: "#15161e",
+                    strokeWidth: 2,
+                    fill: "#5c59f0",
                   }}
-                  activeDot={{ r: 6, strokeWidth: 0 }}
+                  activeDot={{ r: 5, strokeWidth: 0, fill: "#5c59f0" }}
+                  label={{
+                    fill: "#fff",
+                    fontSize: 9,
+                    position: "top",
+                    dy: -10,
+                    fontWeight: 600,
+                  }}
                 />
               </LineChart>
             </ResponsiveContainer>

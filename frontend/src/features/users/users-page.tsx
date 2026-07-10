@@ -5,7 +5,8 @@
 "use client";
 
 import { useState } from "react";
-import { Edit2, ShieldAlert } from "lucide-react";
+import Link from "next/link";
+import { Edit2, ShieldAlert, Plus } from "lucide-react";
 import { useUsers } from "@/hooks/use-users";
 import { useAuthStore } from "@/stores/auth-store";
 import { PageHeader } from "@/components/layout/page-header";
@@ -120,11 +121,31 @@ export function UsersPage() {
   ];
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
-      <PageHeader
-        title="User Management"
-        subtitle="View registered members, check active statuses, and assign authorization roles."
-      />
+    <div className="min-h-screen bg-[#0d0e12] text-slate-100 p-6 space-y-6">
+      {/* Top Header / Breadcrumbs */}
+      <div className="flex items-center justify-between">
+        <div>
+          <nav className="text-xs font-medium text-slate-500 flex items-center gap-1.5">
+            <span>Member Workspace</span>
+            <span>/</span>
+            <span className="text-slate-300">User Management</span>
+          </nav>
+        </div>
+        <Link
+          href="/reports/new"
+          className="inline-flex items-center gap-1 bg-[#5c59f0] hover:bg-[#4b48d9] text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors shadow-md h-8"
+        >
+          <Plus className="h-3.5 w-3.5" />
+          Submit Report
+        </Link>
+      </div>
+
+      {/* Section Divider */}
+      <div className="flex items-center justify-between border-b border-[#21222d] pb-4">
+        <h2 className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+          Registered Members
+        </h2>
+      </div>
 
       {/* Users DataTable */}
       <DataTable

@@ -46,10 +46,17 @@ export function useReport(id: string) {
 export function useCreateReport() {
   const queryClient = useQueryClient();
 
-  return useMutation<Report, Error, ReportCreate>({
-    mutationFn: (data) => apiClient.post<Report>(API_ENDPOINTS.REPORTS, data),
-    onSuccess: () => {
+  return useMutation<Report, Error, ReportCreate & { submit?: boolean }>({
+    mutationFn: ({ submit, ...data }) =>
+      apiClient.post<Report>(
+        submit ? `${API_ENDPOINTS.REPORTS}?submit=true` : API_ENDPOINTS.REPORTS,
+        data
+      ),
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["reports"] });
+      if (variables.submit) {
+        queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      }
     },
   });
 }
@@ -61,11 +68,18 @@ export function useCreateReport() {
 export function useUpdateReport(id: string) {
   const queryClient = useQueryClient();
 
-  return useMutation<Report, Error, ReportUpdate>({
-    mutationFn: (data) => apiClient.put<Report>(API_ENDPOINTS.REPORT(id), data),
-    onSuccess: () => {
+  return useMutation<Report, Error, ReportUpdate & { submit?: boolean }>({
+    mutationFn: ({ submit, ...data }) =>
+      apiClient.put<Report>(
+        submit ? `${API_ENDPOINTS.REPORT(id)}?submit=true` : API_ENDPOINTS.REPORT(id),
+        data
+      ),
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.report(id) });
       queryClient.invalidateQueries({ queryKey: ["reports"] });
+      if (variables.submit) {
+        queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      }
     },
   });
 }

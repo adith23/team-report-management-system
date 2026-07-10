@@ -57,6 +57,9 @@ class Settings(BaseSettings):
 
     # ── AI (Optional) ────────────────────────────────────────────
     OPENAI_API_KEY: str | None = None
+    GEMINI_API_KEY: str | None = None
+    PINECONE_API_KEY: str | None = None
+    PINECONE_INDEX_NAME: str = "team-reports"
 
     @property
     def is_production(self) -> bool:

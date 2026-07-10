@@ -43,9 +43,11 @@ class ReportService:
         self,
         report_repo: ReportRepository,
         project_repo: ProjectRepository,
+        vector_service,
     ) -> None:
         self._report_repo = report_repo
         self._project_repo = project_repo
+        self._vector_service = vector_service
 
     def _normalize_week(self, week_start: date) -> tuple[date, date]:
         """
@@ -165,7 +167,9 @@ class ReportService:
 
         # 2. Check ownership
         if report.user_id != current_user.id:
-            raise ForbiddenException("You do not have permission to modify this report.")
+            raise ForbiddenException(
+                "You do not have permission to modify this report."
+            )
 
         # Prepare update dict
         update_data = {}
@@ -208,9 +212,6 @@ class ReportService:
             update_data["submitted_at"] = None
             logger.info("Report %s edited; resetting status to DRAFT", report_id)
 
-        # Apply basic updates
-        await self._report_repo.update(report, update_data)
-
         # 7. Batch replace tasks if provided
         if data.tasks_completed is not None or data.tasks_planned is not None:
             # Clear old tasks
@@ -218,7 +219,9 @@ class ReportService:
             sort_idx = 0
 
             # completed tasks (new or preserved)
-            completed_source = data.tasks_completed if data.tasks_completed is not None else []
+            completed_source = (
+                data.tasks_completed if data.tasks_completed is not None else []
+            )
             for item in completed_source:
                 task = ReportTask(
                     task_type=TaskType.COMPLETED,
@@ -229,7 +232,9 @@ class ReportService:
                 sort_idx += 1
 
             # planned tasks
-            planned_source = data.tasks_planned if data.tasks_planned is not None else []
+            planned_source = (
+                data.tasks_planned if data.tasks_planned is not None else []
+            )
             for item in planned_source:
                 task = ReportTask(
                     task_type=TaskType.PLANNED,
@@ -252,10 +257,15 @@ class ReportService:
                 report.blockers.append(blocker)
                 blocker_idx += 1
 
+        # Apply basic updates (which will flush and refresh columns)
+        await self._report_repo.update(report, update_data)
+
         # Commit/Flush changes through the session (handled by transaction generator)
         return await self._report_repo.get_report_with_relations(report_id)
 
-    async def submit_report(self, report_id: uuid.UUID, current_user: User) -> WeeklyReport:
+    async def submit_report(
+        self, report_id: uuid.UUID, current_user: User
+    ) -> WeeklyReport:
         """
         Submit a draft weekly report.
 
@@ -272,7 +282,9 @@ class ReportService:
             raise NotFoundException("WeeklyReport", str(report_id))
 
         if report.user_id != current_user.id:
-            raise ForbiddenException("You do not have permission to submit this report.")
+            raise ForbiddenException(
+                "You do not have permission to submit this report."
+            )
 
         if report.status != ReportStatus.DRAFT:
             raise BadRequestException("Report is already submitted.")
@@ -282,7 +294,12 @@ class ReportService:
         today = date.today()
         if today > report.week_end:
             status = ReportStatus.LATE
-            logger.info("Report %s submitted LATE (today %s > end %s)", report_id, today, report.week_end)
+            logger.info(
+                "Report %s submitted LATE (today %s > end %s)",
+                report_id,
+                today,
+                report.week_end,
+            )
         else:
             status = ReportStatus.SUBMITTED
             logger.info("Report %s submitted on time", report_id)
@@ -292,9 +309,51 @@ class ReportService:
             "submitted_at": datetime.now(timezone.utc).replace(tzinfo=None),
         }
 
-        return await self._report_repo.update(report, update_payload)
+        await self._report_repo.update(report, update_payload)
+        
+        # 6. semantic search indexing of submitted report
+        updated_report = await self._report_repo.get_report_with_relations(report_id)
+        if updated_report:
+            import asyncio
+            try:
+                # Resolve task types cleanly (checking string or enum matches)
+                tasks_completed = []
+                tasks_planned = []
+                for t in updated_report.tasks:
+                    t_type = getattr(t.task_type, "value", str(t.task_type)).upper()
+                    if t_type == "COMPLETED":
+                        tasks_completed.append(t.description)
+                    elif t_type == "PLANNED":
+                        tasks_planned.append(t.description)
 
-    async def get_report_detail(self, report_id: uuid.UUID, current_user: User) -> WeeklyReport:
+                report_dict = {
+                    "user_id": str(updated_report.user_id),
+                    "user_name": updated_report.user.full_name if updated_report.user else "Unknown Member",
+                    "project_name": updated_report.project.name if updated_report.project else "Uncategorized",
+                    "week_start": str(updated_report.week_start),
+                    "week_end": str(updated_report.week_end),
+                    "hours_worked": updated_report.hours_worked,
+                    "notes": updated_report.notes,
+                    "tasks_completed": tasks_completed,
+                    "tasks_planned": tasks_planned,
+                    "blockers": [
+                        {"description": b.description, "is_resolved": b.is_resolved}
+                        for b in updated_report.blockers
+                    ],
+                }
+                
+                # Execute fire-and-forget indexing task in event loop
+                asyncio.create_task(
+                    self._vector_service.upsert_report(str(updated_report.id), report_dict)
+                )
+            except Exception as index_err:
+                logger.error("Failed to enqueue vector index task for report %s: %s", report_id, str(index_err))
+
+        return updated_report
+
+    async def get_report_detail(
+        self, report_id: uuid.UUID, current_user: User
+    ) -> WeeklyReport:
         """
         Get full report details.
 
@@ -376,7 +435,9 @@ class ReportService:
             raise NotFoundException("WeeklyReport", str(report_id))
 
         if report.user_id != current_user.id:
-            raise ForbiddenException("You do not have permission to delete this report.")
+            raise ForbiddenException(
+                "You do not have permission to delete this report."
+            )
 
         if report.status != ReportStatus.DRAFT:
             raise BadRequestException("You can only delete reports in DRAFT status.")

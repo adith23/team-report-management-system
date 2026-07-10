@@ -15,6 +15,7 @@ export function useProjects() {
   return useQuery<Project[]>({
     queryKey: QUERY_KEYS.projects,
     queryFn: () => apiClient.get<Project[]>(API_ENDPOINTS.PROJECTS),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes since projects change infrequently
   });
 }
 

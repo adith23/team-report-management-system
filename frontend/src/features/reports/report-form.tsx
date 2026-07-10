@@ -6,6 +6,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
@@ -14,7 +15,6 @@ import {
   useReport,
   useCreateReport,
   useUpdateReport,
-  useSubmitReport,
 } from "@/hooks/use-reports";
 import { useProjects } from "@/hooks/use-projects";
 import { PageHeader } from "@/components/layout/page-header";
@@ -62,7 +62,7 @@ export function ReportForm({ mode, reportId }: ReportFormProps) {
   // Mutations
   const createMutation = useCreateReport();
   const updateMutation = useUpdateReport(reportId || "");
-  const submitMutation = useSubmitReport();
+
 
   // Dynamic field states (not bound directly to simple inputs)
   const [tasksCompleted, setTasksCompleted] = useState<DynamicFieldItem[]>([{ value: "" }]);
@@ -197,36 +197,32 @@ export function ReportForm({ mode, reportId }: ReportFormProps) {
     if (!validateDynamicLists()) return;
     const payload = preparePayload(formValues);
 
-    const performSubmission = (id: string) => {
-      submitMutation.mutate(id, {
-        onSuccess: () => {
-          toast.success("Report submitted successfully!");
-          router.push(ROUTES.REPORTS);
-        },
-        onError: (err) => {
-          toast.error(err.message || "Failed to submit report.");
-        },
-      });
-    };
-
     if (mode === "create") {
-      createMutation.mutate(payload, {
-        onSuccess: (newReport) => {
-          performSubmission(newReport.id);
-        },
-        onError: (err) => {
-          toast.error(err.message || "Failed to save draft before submission.");
-        },
-      });
+      createMutation.mutate(
+        { ...payload, submit: true },
+        {
+          onSuccess: () => {
+            toast.success("Report submitted successfully!");
+            router.push(ROUTES.REPORTS);
+          },
+          onError: (err) => {
+            toast.error(err.message || "Failed to submit report.");
+          },
+        }
+      );
     } else {
-      updateMutation.mutate(payload as ReportUpdate, {
-        onSuccess: (updatedReport) => {
-          performSubmission(updatedReport.id);
-        },
-        onError: (err) => {
-          toast.error(err.message || "Failed to save changes before submission.");
-        },
-      });
+      updateMutation.mutate(
+        { ...(payload as ReportUpdate), submit: true },
+        {
+          onSuccess: () => {
+            toast.success("Report submitted successfully!");
+            router.push(ROUTES.REPORTS);
+          },
+          onError: (err) => {
+            toast.error(err.message || "Failed to submit report.");
+          },
+        }
+      );
     }
   };
 
@@ -240,27 +236,35 @@ export function ReportForm({ mode, reportId }: ReportFormProps) {
   }
 
   const isSubmitting =
-    createMutation.isPending || updateMutation.isPending || submitMutation.isPending;
+    createMutation.isPending || updateMutation.isPending;
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12">
-      {/* Header and Back Link */}
-      <div className="flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => router.back()}
-          className="text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"
-        >
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          Back
-        </Button>
+      {/* Top Header / Breadcrumbs */}
+      <div className="flex items-center justify-between">
+        <div>
+          <nav className="text-xs font-medium text-slate-500 flex items-center gap-1.5">
+            <span>Member Workspace</span>
+            <span>/</span>
+            <Link href={ROUTES.REPORTS} className="hover:text-slate-300 transition-colors">
+              Weekly Reports
+            </Link>
+            <span>/</span>
+            <span className="text-slate-300">{mode === "create" ? "New" : "Edit"}</span>
+          </nav>
+        </div>
       </div>
 
-      <PageHeader
-        title={mode === "create" ? "Create Weekly Report" : "Edit Weekly Report"}
-        subtitle="Report your weekly metrics, tasks, planned activities, and blocker details."
-      />
+      <div className="flex items-center justify-between border-b border-[#21222d] pb-4">
+        <div>
+          <h2 className="text-sm font-bold text-slate-100 uppercase tracking-wider">
+            {mode === "create" ? "Create Weekly Report" : "Edit Weekly Report"}
+          </h2>
+          <p className="text-xs text-slate-400 mt-1">
+            Report your weekly metrics, tasks, planned activities, and blocker details.
+          </p>
+        </div>
+      </div>
 
       <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 md:p-8 space-y-6 shadow-sm">
         {/* Row: Week Range & Project Selection */}
@@ -412,15 +416,15 @@ export function ReportForm({ mode, reportId }: ReportFormProps) {
         </div>
 
         {/* Footer Submit / Save actions */}
-        <div className="border-t border-[hsl(var(--border))] pt-6 flex items-center justify-end gap-3">
+        <div className="border-t border-[#21222d] pt-6 flex items-center justify-end gap-3">
           <Button
             type="button"
             variant="secondary"
             onClick={handleSubmit(onSaveDraft)}
             disabled={isSubmitting}
-            className="flex items-center gap-1.5"
+            className="bg-transparent border border-[#2c2d3c] hover:bg-slate-800 text-slate-300 hover:text-white text-xs px-3 py-1.5 h-8 rounded-lg cursor-pointer transition-colors flex items-center gap-1.5"
           >
-            <Save className="h-4 w-4" />
+            <Save className="h-3.5 w-3.5" />
             Save Draft
           </Button>
 
@@ -429,9 +433,9 @@ export function ReportForm({ mode, reportId }: ReportFormProps) {
             variant="primary"
             onClick={handleSubmit(onSubmitReport)}
             disabled={isSubmitting}
-            className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white"
+            className="bg-[#5c59f0] hover:bg-[#4b48d9] text-white text-xs px-3 py-1.5 h-8 rounded-lg transition-colors flex items-center gap-1.5 shadow-md"
           >
-            <Send className="h-4 w-4" />
+            <Send className="h-3.5 w-3.5" />
             Submit Report
           </Button>
         </div>

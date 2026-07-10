@@ -168,11 +168,29 @@ async def get_project_service(db: AsyncSession = Depends(get_db)) -> "ProjectSer
     return ProjectService(ProjectRepository(db))
 
 
+_embedding_service = None
+_vector_service = None
+
+def get_vector_service() -> "VectorService":
+    global _embedding_service, _vector_service
+    if _vector_service is None:
+        from app.services.ai.embedding_service import EmbeddingService
+        from app.services.ai.vector_service import VectorService
+        if _embedding_service is None:
+            _embedding_service = EmbeddingService()
+        _vector_service = VectorService(_embedding_service)
+    return _vector_service
+
+
 async def get_report_service(db: AsyncSession = Depends(get_db)) -> "ReportService":
     from app.repositories import ReportRepository, ProjectRepository
     from app.services import ReportService
 
-    return ReportService(ReportRepository(db), ProjectRepository(db))
+    return ReportService(
+        report_repo=ReportRepository(db),
+        project_repo=ProjectRepository(db),
+        vector_service=get_vector_service(),
+    )
 
 
 async def get_dashboard_service(
@@ -187,6 +205,10 @@ async def get_dashboard_service(
 async def get_ai_service(db: AsyncSession = Depends(get_db)) -> "AIService":
     from app.repositories import ReportRepository
     from app.services import AIService
-    from app.services.ai.openai_strategy import OpenAIStrategy
+    from app.services.ai.gemini_strategy import GeminiStrategy
 
-    return AIService(OpenAIStrategy(), ReportRepository(db))
+    return AIService(
+        llm=GeminiStrategy(),
+        report_repo=ReportRepository(db),
+        vector_service=get_vector_service(),
+    )

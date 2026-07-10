@@ -56,14 +56,11 @@ export function DropdownMenu({
   }, [open]);
 
   // Close on Escape
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setOpen(false);
-      }
-    },
-    [],
-  );
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === "Escape") {
+      setOpen(false);
+    }
+  }, []);
 
   return (
     <div ref={containerRef} className="relative" onKeyDown={handleKeyDown}>

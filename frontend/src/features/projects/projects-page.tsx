@@ -5,20 +5,22 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Edit2, Trash2, FolderKanban } from "lucide-react";
+import { Plus, Edit2, Trash2 } from "lucide-react";
 import { useProjects, useDeleteProject } from "@/hooks/use-projects";
-import { PageHeader } from "@/components/layout/page-header";
+import { useTeamReports } from "@/hooks/use-reports";
 import { Button } from "@/components/ui/button";
-import { DataTable } from "@/components/data-display/data-table";
 import { ProjectFormModal } from "./project-form-modal";
 import { ConfirmDialog } from "@/components/feedback/confirm-dialog";
-import { formatDate } from "@/lib/date-utils";
+import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/components/ui/toast";
 import type { Project } from "@/types";
 
 export function ProjectsPage() {
-  const { data: projects, isLoading, isError } = useProjects();
+  const { data: projects, isLoading: loadingProjects } = useProjects();
+  const { data: reportsData } = useTeamReports({ limit: 1000 });
   const deleteMutation = useDeleteProject();
+
+  const reports = reportsData?.items || [];
 
   // Modal State
   const [modalOpen, setModalOpen] = useState(false);
@@ -55,101 +57,108 @@ export function ProjectsPage() {
     });
   };
 
-  // Define table columns
-  const columns = [
-    {
-      key: "name",
-      header: "Project / Category Name",
-      sortable: true,
-      cellClassName: "font-medium text-slate-900 dark:text-slate-100",
-    },
-    {
-      key: "description",
-      header: "Description",
-      render: (project: Project) => (
-        <span className="text-slate-500 dark:text-slate-400 max-w-xs block truncate" title={project.description || ""}>
-          {project.description || "—"}
-        </span>
-      ),
-    },
-    {
-      key: "color_hex",
-      header: "Color Tag",
-      render: (project: Project) => (
-        <div className="flex items-center gap-2">
-          <span
-            className="h-4 w-4 rounded-full border border-black/10 shrink-0"
-            style={{ backgroundColor: project.color_hex }}
-          />
-          <span className="text-xs font-mono font-medium uppercase text-slate-500">
-            {project.color_hex}
-          </span>
-        </div>
-      ),
-    },
-    {
-      key: "created_at",
-      header: "Created Date",
-      sortable: true,
-      render: (project: Project) => <span>{formatDate(project.created_at)}</span>,
-    },
-    {
-      key: "actions",
-      header: "Actions",
-      cellClassName: "text-right",
-      headerClassName: "text-right",
-      render: (project: Project) => (
-        <div className="flex items-center justify-end gap-1.5">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleEditClick(project)}
-            className="text-slate-500 hover:text-indigo-600 h-8 w-8 p-0"
-            title="Edit project"
-          >
-            <Edit2 className="h-3.5 w-3.5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleDeleteClick(project.id)}
-            className="text-slate-500 hover:text-red-600 h-8 w-8 p-0"
-            title="Delete project"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </Button>
-        </div>
-      ),
-    },
-  ];
+  // Helper to count submitted reports linked to a project
+  const countLinkedReports = (projectId: string) => {
+    return reports.filter(
+      (r) =>
+        r.project_id === projectId &&
+        (r.status === "SUBMITTED" || r.status === "LATE"),
+    ).length;
+  };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
-      <PageHeader
-        title="Project Categories"
-        subtitle="Manage and define color-tagged project categories for weekly report tracking."
-        action={
-          <Button variant="primary" onClick={handleAddClick} className="bg-indigo-600 hover:bg-indigo-500 text-white">
-            <Plus className="h-4 w-4 mr-1" />
-            Add Project
-          </Button>
-        }
-      />
+    <div className="min-h-screen bg-[#0d0e12] text-slate-100 p-6 space-y-6">
+      {/* Title Header Row (Add Project aligned on right) */}
+      <div className="flex items-center justify-between border-b border-[#21222d] pb-4">
+        <h2 className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+          Active Projects / Categories
+        </h2>
+        <Button
+          variant="secondary"
+          onClick={handleAddClick}
+          className="bg-transparent border border-[#2c2d3c] hover:bg-slate-800 text-slate-300 hover:text-white text-xs px-3 py-1.5 h-8 rounded-lg cursor-pointer transition-colors"
+        >
+          <Plus className="h-3.5 w-3.5 mr-1" />
+          Add Project
+        </Button>
+      </div>
 
-      {/* Projects Table */}
-      <DataTable
-        columns={columns}
-        data={(projects as any) || []}
-        keyExtractor={(p) => p.id}
-        loading={isLoading}
-        emptyTitle="No project categories"
-        emptyDescription="Create project categories so team members can assign weekly reports to specific projects."
-        emptyAction={
-          <Button variant="primary" onClick={handleAddClick} className="bg-indigo-600 hover:bg-indigo-500 text-white">
+      {/* Project Cards Grid */}
+      {loadingProjects ? (
+        <div className="py-24 flex justify-center">
+          <Spinner />
+        </div>
+      ) : !projects || projects.length === 0 ? (
+        <div className="bg-[#15161e] border border-[#21222d] rounded-2xl p-12 text-center text-slate-500">
+          <p className="text-sm">No project categories found.</p>
+          <Button
+            variant="primary"
+            onClick={handleAddClick}
+            className="mt-4 bg-[#5c59f0] hover:bg-[#4b48d9] text-white text-xs"
+          >
             Add First Project
           </Button>
-        }
-      />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {projects.map((project) => {
+            const reportCount = countLinkedReports(project.id);
+            return (
+              <div
+                key={project.id}
+                className="group relative bg-[#15161e] border border-[#21222d] hover:border-slate-700/60 rounded-2xl p-7 transition-all duration-200 shadow-sm flex flex-col justify-between h-[190px]"
+              >
+                {/* Edit & Delete hover icons */}
+                <div className="absolute top-4 right-4 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <button
+                    onClick={() => handleEditClick(project)}
+                    className="h-6 w-6 rounded bg-[#1c1d26] border border-[#2c2d3c] text-slate-400 hover:text-white flex items-center justify-center cursor-pointer transition-colors"
+                    title="Edit project"
+                  >
+                    <Edit2 className="h-3 w-3" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteClick(project.id)}
+                    className="h-6 w-6 rounded bg-[#1c1d26] border border-[#2c2d3c] text-slate-400 hover:text-red-500 flex items-center justify-center cursor-pointer transition-colors"
+                    title="Delete project"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </button>
+                </div>
+
+                {/* Top Section: Name and Dot */}
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-2.5 pr-12">
+                    <span
+                      className="w-3 h-3 rounded-full shrink-0"
+                      style={{ backgroundColor: project.color_hex }}
+                    />
+                    <h3
+                      className="font-semibold text-sm text-slate-100 truncate"
+                      title={project.name}
+                    >
+                      {project.name}
+                    </h3>
+                  </div>
+
+                  {/* Middle Section: Description */}
+                  <p className="text-xs text-slate-400 font-medium line-clamp-4 leading-relaxed">
+                    {project.description || "No project description provided."}
+                  </p>
+                </div>
+
+                {/* Bottom Section: Submission counter */}
+                <div className="pt-4 border-t border-[#21222d]/40">
+                  <span className="text-[10px] text-slate-500 font-semibold tracking-wide">
+                    {reportCount} submitted report{reportCount !== 1 ? "s" : ""}{" "}
+                    linked
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Project Form Modal */}
       <ProjectFormModal

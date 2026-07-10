@@ -25,6 +25,7 @@ export function useMetrics(weekStart: string) {
         week_start: weekStart,
       }),
     enabled: !!weekStart,
+    staleTime: 60 * 1000, // Cache metrics for 1 minute
   });
 }
 
@@ -41,6 +42,7 @@ export function useSubmissionStatus(weekStart: string) {
         { week_start: weekStart },
       ),
     enabled: !!weekStart,
+    staleTime: 60 * 1000, // Cache compliance list for 1 minute
   });
 }
 
@@ -56,6 +58,7 @@ export function useTasksTrend(weeks: number = 12, userId?: string) {
         weeks,
         ...(userId && { user_id: userId }),
       }),
+    staleTime: 60 * 1000, // Cache task trend metrics for 1 minute
   });
 }
 
@@ -72,6 +75,7 @@ export function useWorkloadDistribution(weekStart: string) {
         { week_start: weekStart },
       ),
     enabled: !!weekStart,
+    staleTime: 60 * 1000, // Cache workload distribution details for 1 minute
   });
 }
 
@@ -84,5 +88,6 @@ export function useRecentActivity() {
     queryKey: QUERY_KEYS.recentActivity,
     queryFn: () =>
       apiClient.get<RecentActivity[]>(API_ENDPOINTS.DASHBOARD_RECENT_ACTIVITY),
+    staleTime: 60 * 1000, // Cache activity feed logs for 1 minute
   });
 }

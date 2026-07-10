@@ -126,10 +126,10 @@ class ReportRepository(BaseRepository[WeeklyReport]):
         count_result = await self._session.execute(count_stmt)
         total = count_result.scalar_one()
 
-        # Data query
         stmt = (
             select(WeeklyReport)
             .options(
+                selectinload(WeeklyReport.user),
                 selectinload(WeeklyReport.project),
                 selectinload(WeeklyReport.tasks),
                 selectinload(WeeklyReport.blockers),
@@ -289,39 +289,46 @@ class ReportRepository(BaseRepository[WeeklyReport]):
         Returns:
             List of dicts with user_id, user_full_name, status, submitted_at.
         """
-        # Fetch all reports for this week
+        # Fetch only the required columns for this week to optimize memory/speed
         stmt = (
-            select(WeeklyReport)
+            select(
+                WeeklyReport.user_id,
+                WeeklyReport.status,
+                WeeklyReport.submitted_at
+            )
             .where(WeeklyReport.week_start == week_start)
         )
         result = await self._session.execute(stmt)
-        reports = result.scalars().all()
+        reports = result.all()
 
-        # Build a lookup: user_id → report
-        user_reports: dict[uuid.UUID, WeeklyReport] = {}
-        for report in reports:
+        # Build a lookup: user_id → report row
+        user_reports: dict[uuid.UUID, dict] = {}
+        for row in reports:
             # If user has multiple reports (different projects), use the one
             # with the "best" status (submitted > late > draft)
-            existing = user_reports.get(report.user_id)
+            existing = user_reports.get(row.user_id)
             if existing is None or (
-                report.status == ReportStatus.SUBMITTED
-                and existing.status != ReportStatus.SUBMITTED
+                row.status == ReportStatus.SUBMITTED
+                and existing["status"] != ReportStatus.SUBMITTED
             ):
-                user_reports[report.user_id] = report
+                user_reports[row.user_id] = {
+                    "status": row.status,
+                    "submitted_at": row.submitted_at
+                }
 
         # Build status list for all active users
         status_list = []
         for user in active_users:
-            report = user_reports.get(user.id)
-            if report is None or report.status == ReportStatus.DRAFT:
+            report_data = user_reports.get(user.id)
+            if report_data is None or report_data["status"] == ReportStatus.DRAFT:
                 status = "pending"
                 submitted_at = None
-            elif report.status == ReportStatus.LATE:
+            elif report_data["status"] == ReportStatus.LATE:
                 status = "late"
-                submitted_at = report.submitted_at
+                submitted_at = report_data["submitted_at"]
             else:
                 status = "submitted"
-                submitted_at = report.submitted_at
+                submitted_at = report_data["submitted_at"]
 
             status_list.append({
                 "user_id": user.id,
