@@ -12,6 +12,9 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 
 
+from app.schemas.user import UserRead
+
+
 class ProjectCreate(BaseModel):
     """
     Project creation request.
@@ -37,6 +40,10 @@ class ProjectCreate(BaseModel):
         examples=["#6366f1"],
         description="Hex color for chart visualization",
     )
+    assigned_user_ids: list[uuid.UUID] | None = Field(
+        default=None,
+        description="Optional list of user IDs to assign to the project",
+    )
 
 
 class ProjectUpdate(BaseModel):
@@ -51,6 +58,10 @@ class ProjectUpdate(BaseModel):
     color_hex: str | None = Field(
         default=None,
         pattern=r"^#[0-9a-fA-F]{6}$",
+    )
+    assigned_user_ids: list[uuid.UUID] | None = Field(
+        default=None,
+        description="Optional list of user IDs to assign (replaces existing assignments)",
     )
 
 
@@ -70,5 +81,17 @@ class ProjectRead(BaseModel):
     created_by: uuid.UUID
     created_at: datetime
     updated_at: datetime
+    assigned_users: list[UserRead] = []
 
     model_config = {"from_attributes": True}
+
+
+class ProjectAssignmentRequest(BaseModel):
+    """
+    Schema for assigning multiple team members to a project.
+    """
+
+    user_ids: list[uuid.UUID] = Field(
+        ...,
+        description="List of team member UUIDs to assign to the project",
+    )

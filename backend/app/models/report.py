@@ -79,6 +79,7 @@ class WeeklyReport(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         comment="Project/category this report is for",
     )
 
+
     # ── Week Range ───────────────────────────────────────────────
     week_start: Mapped[date] = mapped_column(
         Date,
@@ -122,27 +123,51 @@ class WeeklyReport(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     user: Mapped["User"] = relationship(
         "User",
         back_populates="reports",
-        lazy="selectin",
+        lazy="raise",
     )
     project: Mapped["Project"] = relationship(
         "Project",
         back_populates="reports",
-        lazy="selectin",
+        lazy="raise",
     )
     tasks: Mapped[list["ReportTask"]] = relationship(
         "ReportTask",
         back_populates="report",
-        lazy="selectin",
+        lazy="raise",
         cascade="all, delete-orphan",
         order_by="ReportTask.sort_order",
     )
     blockers: Mapped[list["ReportBlocker"]] = relationship(
         "ReportBlocker",
         back_populates="report",
-        lazy="selectin",
+        lazy="raise",
         cascade="all, delete-orphan",
         order_by="ReportBlocker.sort_order",
     )
+
+    @property
+    def user_full_name(self) -> str:
+        return self.user.full_name if self.user else ""
+
+    @property
+    def project_name(self) -> str:
+        return self.project.name if self.project else ""
+
+    @property
+    def project_name(self) -> str:
+        return self.project.name if self.project else ""
+
+    @property
+    def tasks_completed(self) -> list["ReportTask"]:
+        from app.core.enums import TaskType
+
+        return [t for t in self.tasks if t.task_type == TaskType.COMPLETED]
+
+    @property
+    def tasks_planned(self) -> list["ReportTask"]:
+        from app.core.enums import TaskType
+
+        return [t for t in self.tasks if t.task_type == TaskType.PLANNED]
 
     def __repr__(self) -> str:
         return (

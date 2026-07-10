@@ -14,6 +14,7 @@ from app.models.project import Project  # noqa: F401
 from app.models.report import WeeklyReport  # noqa: F401
 from app.models.report_task import ReportTask  # noqa: F401
 from app.models.report_blocker import ReportBlocker  # noqa: F401
+from app.models.user_project import UserProjectAssignment  # noqa: F401
 
 __all__ = [
     "Base",
@@ -22,4 +23,5 @@ __all__ = [
     "WeeklyReport",
     "ReportTask",
     "ReportBlocker",
+    "UserProjectAssignment",
 ]

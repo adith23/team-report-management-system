@@ -78,6 +78,12 @@ class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         back_populates="creator",
         lazy="selectin",
     )
+    assigned_projects: Mapped[list["Project"]] = relationship(
+        "Project",
+        secondary="user_project_assignments",
+        back_populates="assigned_users",
+        lazy="selectin",
+    )
 
     def __repr__(self) -> str:
         return f"<User(id={self.id}, email={self.email}, role={self.role})>"

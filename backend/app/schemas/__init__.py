@@ -26,7 +26,7 @@ from app.schemas.report import (  # noqa: F401
 )
 
 # Project
-from app.schemas.project import ProjectCreate, ProjectRead, ProjectUpdate  # noqa: F401
+from app.schemas.project import ProjectCreate, ProjectRead, ProjectUpdate, ProjectAssignmentRequest  # noqa: F401
 
 # Dashboard
 from app.schemas.dashboard import (  # noqa: F401
@@ -61,6 +61,7 @@ __all__ = [
     "ProjectCreate",
     "ProjectUpdate",
     "ProjectRead",
+    "ProjectAssignmentRequest",
     # Dashboard
     "DashboardMetrics",
     "SubmissionStatusItem",

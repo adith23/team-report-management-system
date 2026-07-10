@@ -7,6 +7,7 @@ Extends BaseRepository with user-specific queries:
 - Active user count (dashboard metrics)
 """
 
+import uuid
 from typing import Sequence
 
 from sqlalchemy import select, func
@@ -84,3 +85,19 @@ class UserRepository(BaseRepository[User]):
         stmt = select(func.count(User.id)).where(User.is_active.is_(True))
         result = await self._session.execute(stmt)
         return result.scalar_one()
+
+    async def get_by_ids(self, ids: list[uuid.UUID]) -> Sequence[User]:
+        """
+        Fetch multiple users by their UUIDs.
+
+        Args:
+            ids: List of user UUIDs.
+
+        Returns:
+            Sequence of User instances.
+        """
+        if not ids:
+            return []
+        stmt = select(User).where(User.id.in_(ids))
+        result = await self._session.execute(stmt)
+        return result.scalars().all()
