@@ -78,6 +78,12 @@ class Project(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         back_populates="project",
         lazy="selectin",
     )
+    assigned_users: Mapped[list["User"]] = relationship(
+        "User",
+        secondary="user_project_assignments",
+        back_populates="assigned_projects",
+        lazy="selectin",
+    )
 
     def __repr__(self) -> str:
         return f"<Project(id={self.id}, name={self.name})>"

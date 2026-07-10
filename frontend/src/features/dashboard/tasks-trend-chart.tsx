@@ -32,7 +32,7 @@ const CustomTooltip = ({ active, payload }: any) => {
         <p className="font-semibold text-slate-300">
           Week of {formatWeekRange(data.week_start)}
         </p>
-        <p className="text-[#5c59f0] font-medium">
+        <p className="text-blue-500 font-medium">
           Tasks Completed: {data.tasks_completed_count}
         </p>
       </div>
@@ -98,15 +98,15 @@ export function TasksTrendChart({ selectedUserId }: TasksTrendChartProps) {
                 <Line
                   type="monotone"
                   dataKey="tasks_completed_count"
-                  stroke="#5c59f0"
+                  stroke="#3b82f6"
                   strokeWidth={2.5}
                   dot={{
                     r: 4,
                     stroke: "#15161e",
                     strokeWidth: 2,
-                    fill: "#5c59f0",
+                    fill: "#3b82f6",
                   }}
-                  activeDot={{ r: 5, strokeWidth: 0, fill: "#5c59f0" }}
+                  activeDot={{ r: 5, strokeWidth: 0, fill: "#3b82f6" }}
                   label={{
                     fill: "#fff",
                     fontSize: 9,

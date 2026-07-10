@@ -136,7 +136,7 @@ export function MetricsGrid({
           </div>
         </div>
 
-        <div className="h-7 w-7 rounded-lg bg-[#5c59f0]/10 flex items-center justify-center border border-[#5c59f0]/25 text-[#5c59f0]">
+        <div className="h-7 w-7 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/25 text-blue-500">
           <Files className="h-4 w-4" />
         </div>
       </div>

@@ -88,7 +88,7 @@ export function ReportCard({ report }: ReportCardProps) {
               Planned Tasks
             </span>
             <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-100">
-              <FileText className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
+              <FileText className="h-3.5 w-3.5 text-blue-400 shrink-0" />
               <span>
                 {plannedCount} {plannedCount === 1 ? "task" : "tasks"}
               </span>

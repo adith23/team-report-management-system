@@ -133,7 +133,7 @@ export function RegisterForm() {
         <Button
           type="submit"
           variant="primary"
-          className="w-full mt-2 bg-indigo-600 text-white hover:bg-indigo-500 transition-colors py-2.5 rounded-lg font-medium shadow-lg shadow-indigo-600/20"
+          className="w-full mt-2 bg-blue-600 text-white hover:bg-blue-500 transition-colors py-2.5 rounded-lg font-medium shadow-lg shadow-blue-600/20"
           loading={registerMutation.isPending}
         >
           Register Account
@@ -144,7 +144,7 @@ export function RegisterForm() {
         <span className="text-slate-400">Already have an account? </span>
         <Link
           href={ROUTES.LOGIN}
-          className="font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
+          className="font-medium text-blue-400 hover:text-blue-300 transition-colors"
         >
           Sign in
         </Link>

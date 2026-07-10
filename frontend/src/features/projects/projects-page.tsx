@@ -74,9 +74,9 @@ export function ProjectsPage() {
           Active Projects / Categories
         </h2>
         <Button
-          variant="secondary"
+          variant="primary"
           onClick={handleAddClick}
-          className="bg-transparent border border-[#2c2d3c] hover:bg-slate-800 text-slate-300 hover:text-white text-xs px-3 py-1.5 h-8 rounded-lg cursor-pointer transition-colors"
+          className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 h-8 rounded-lg cursor-pointer transition-colors shadow-md"
         >
           <Plus className="h-3.5 w-3.5 mr-1" />
           Add Project
@@ -94,7 +94,7 @@ export function ProjectsPage() {
           <Button
             variant="primary"
             onClick={handleAddClick}
-            className="mt-4 bg-[#5c59f0] hover:bg-[#4b48d9] text-white text-xs"
+            className="mt-4 bg-blue-600 hover:bg-blue-500 text-white text-xs"
           >
             Add First Project
           </Button>
@@ -106,7 +106,7 @@ export function ProjectsPage() {
             return (
               <div
                 key={project.id}
-                className="group relative bg-[#15161e] border border-[#21222d] hover:border-slate-700/60 rounded-2xl p-7 transition-all duration-200 shadow-sm flex flex-col justify-between h-[190px]"
+                className="group relative bg-[#15161e] border border-[#21222d] hover:border-slate-700/60 rounded-2xl p-7 transition-all duration-200 shadow-sm flex flex-col justify-between min-h-[200px] gap-4"
               >
                 {/* Edit & Delete hover icons */}
                 <div className="absolute top-4 right-4 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -147,12 +147,33 @@ export function ProjectsPage() {
                   </p>
                 </div>
 
-                {/* Bottom Section: Submission counter */}
-                <div className="pt-4 border-t border-[#21222d]/40">
-                  <span className="text-[10px] text-slate-500 font-semibold tracking-wide">
-                    {reportCount} submitted report{reportCount !== 1 ? "s" : ""}{" "}
-                    linked
-                  </span>
+                {/* Bottom Section: Submission counter + Assigned Members */}
+                <div className="pt-4 border-t border-[#21222d]/40 space-y-3">
+                  <div className="flex justify-between items-center text-[10px] text-slate-500 font-semibold tracking-wide">
+                    <span>
+                      {reportCount} submitted report{reportCount !== 1 ? "s" : ""}{" "}
+                      linked
+                    </span>
+                  </div>
+
+                  {project.assigned_users && project.assigned_users.length > 0 && (
+                    <div className="space-y-1">
+                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                        Assigned ({project.assigned_users.length}):
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {project.assigned_users.map((u) => (
+                          <span
+                            key={u.id}
+                            className="text-[9px] bg-[#1c1d26] border border-[#2c2d3c] text-slate-300 px-2 py-0.5 rounded-full font-medium"
+                            title={u.email}
+                          >
+                            {u.full_name}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             );

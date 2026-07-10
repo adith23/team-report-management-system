@@ -22,7 +22,10 @@ import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/forms/form-field";
 import { WeekPicker } from "@/components/forms/week-picker";
 import { ProjectSelect } from "@/components/forms/project-select";
-import { DynamicFieldList, type DynamicFieldItem } from "@/components/forms/dynamic-field-list";
+import {
+  DynamicFieldList,
+  type DynamicFieldItem,
+} from "@/components/forms/dynamic-field-list";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
@@ -57,16 +60,21 @@ export function ReportForm({ mode, reportId }: ReportFormProps) {
   const { data: projectList } = useProjects();
 
   // API query (edit mode)
-  const { data: existingReport, isLoading: isReportLoading } = useReport(reportId || "");
+  const { data: existingReport, isLoading: isReportLoading } = useReport(
+    reportId || "",
+  );
 
   // Mutations
   const createMutation = useCreateReport();
   const updateMutation = useUpdateReport(reportId || "");
 
-
   // Dynamic field states (not bound directly to simple inputs)
-  const [tasksCompleted, setTasksCompleted] = useState<DynamicFieldItem[]>([{ value: "" }]);
-  const [tasksPlanned, setTasksPlanned] = useState<DynamicFieldItem[]>([{ value: "" }]);
+  const [tasksCompleted, setTasksCompleted] = useState<DynamicFieldItem[]>([
+    { value: "" },
+  ]);
+  const [tasksPlanned, setTasksPlanned] = useState<DynamicFieldItem[]>([
+    { value: "" },
+  ]);
   const [blockers, setBlockers] = useState<DynamicFieldItem[]>([]);
 
   // Hook Form setup
@@ -101,21 +109,25 @@ export function ReportForm({ mode, reportId }: ReportFormProps) {
       setTimeout(() => {
         setTasksCompleted(
           existingReport.tasks_completed.length > 0
-            ? existingReport.tasks_completed.map((t) => ({ value: t.description }))
-            : [{ value: "" }]
+            ? existingReport.tasks_completed.map((t) => ({
+                value: t.description,
+              }))
+            : [{ value: "" }],
         );
 
         setTasksPlanned(
           existingReport.tasks_planned.length > 0
-            ? existingReport.tasks_planned.map((t) => ({ value: t.description }))
-            : [{ value: "" }]
+            ? existingReport.tasks_planned.map((t) => ({
+                value: t.description,
+              }))
+            : [{ value: "" }],
         );
 
         setBlockers(
           existingReport.blockers.map((b) => ({
             value: b.description,
             meta: { is_resolved: b.is_resolved },
-          }))
+          })),
         );
       }, 0);
     }
@@ -208,7 +220,7 @@ export function ReportForm({ mode, reportId }: ReportFormProps) {
           onError: (err) => {
             toast.error(err.message || "Failed to submit report.");
           },
-        }
+        },
       );
     } else {
       updateMutation.mutate(
@@ -221,7 +233,7 @@ export function ReportForm({ mode, reportId }: ReportFormProps) {
           onError: (err) => {
             toast.error(err.message || "Failed to submit report.");
           },
-        }
+        },
       );
     }
   };
@@ -235,8 +247,7 @@ export function ReportForm({ mode, reportId }: ReportFormProps) {
     );
   }
 
-  const isSubmitting =
-    createMutation.isPending || updateMutation.isPending;
+  const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12">
@@ -246,11 +257,16 @@ export function ReportForm({ mode, reportId }: ReportFormProps) {
           <nav className="text-xs font-medium text-slate-500 flex items-center gap-1.5">
             <span>Member Workspace</span>
             <span>/</span>
-            <Link href={ROUTES.REPORTS} className="hover:text-slate-300 transition-colors">
+            <Link
+              href={ROUTES.REPORTS}
+              className="hover:text-slate-300 transition-colors"
+            >
               Weekly Reports
             </Link>
             <span>/</span>
-            <span className="text-slate-300">{mode === "create" ? "New" : "Edit"}</span>
+            <span className="text-slate-300">
+              {mode === "create" ? "New" : "Edit"}
+            </span>
           </nav>
         </div>
       </div>
@@ -261,7 +277,8 @@ export function ReportForm({ mode, reportId }: ReportFormProps) {
             {mode === "create" ? "Create Weekly Report" : "Edit Weekly Report"}
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Report your weekly metrics, tasks, planned activities, and blocker details.
+            Report your weekly metrics, tasks, planned activities, and blocker
+            details.
           </p>
         </div>
       </div>
@@ -351,7 +368,8 @@ export function ReportForm({ mode, reportId }: ReportFormProps) {
               Blockers / Challenges
             </h3>
             <p className="text-xs text-[hsl(var(--muted-foreground))] mt-0.5">
-              Detail any blockers, dependency challenges, or issues requiring assistance.
+              Detail any blockers, dependency challenges, or issues requiring
+              assistance.
             </p>
           </div>
           <DynamicFieldList
@@ -384,7 +402,10 @@ export function ReportForm({ mode, reportId }: ReportFormProps) {
                     disabled={isSubmitting}
                     value={field.value ?? ""}
                     onChange={(e) => {
-                      const val = e.target.value === "" ? null : parseFloat(e.target.value);
+                      const val =
+                        e.target.value === ""
+                          ? null
+                          : parseFloat(e.target.value);
                       field.onChange(val);
                     }}
                   />
@@ -433,7 +454,7 @@ export function ReportForm({ mode, reportId }: ReportFormProps) {
             variant="primary"
             onClick={handleSubmit(onSubmitReport)}
             disabled={isSubmitting}
-            className="bg-[#5c59f0] hover:bg-[#4b48d9] text-white text-xs px-3 py-1.5 h-8 rounded-lg transition-colors flex items-center gap-1.5 shadow-md"
+            className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 h-8 rounded-lg transition-colors flex items-center gap-1.5 shadow-md"
           >
             <Send className="h-3.5 w-3.5" />
             Submit Report

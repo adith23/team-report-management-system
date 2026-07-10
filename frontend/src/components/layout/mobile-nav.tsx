@@ -16,7 +16,7 @@ import {
   Bot,
   X,
   LogOut,
-  BarChart3,
+  Layers,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth-store";
@@ -99,9 +99,9 @@ export function MobileNav() {
         <div className="flex h-16 items-center justify-between border-b border-[hsl(var(--border))] px-4">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[hsl(var(--primary))]">
-              <BarChart3 className="h-5 w-5 text-[hsl(var(--primary-foreground))]" />
+              <Layers className="h-5 w-5 text-[hsl(var(--primary-foreground))]" />
             </div>
-            <span className="text-lg font-bold">Team Reports</span>
+            <span className="text-lg font-bold">TaskFlow</span>
           </div>
           <button
             type="button"

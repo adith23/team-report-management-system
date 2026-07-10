@@ -118,7 +118,7 @@ export function ReportDetail({ reportId }: ReportDetailProps) {
               variant="primary"
               onClick={handleSubmitting}
               loading={isPendingActions}
-              className="bg-[#5c59f0] hover:bg-[#4b48d9] text-white text-xs px-3 py-1.5 h-8 rounded-lg transition-colors flex items-center gap-1.5 shadow-md"
+              className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 h-8 rounded-lg transition-colors flex items-center gap-1.5 shadow-md"
             >
               <Send className="h-3.5 w-3.5" />
               Submit Report
@@ -137,8 +137,8 @@ export function ReportDetail({ reportId }: ReportDetailProps) {
       {/* Metadata card: Project, hours, submit status */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="flex items-center gap-4 p-5">
-          <div className="h-10 w-10 rounded-lg bg-indigo-500/10 flex items-center justify-center shrink-0">
-            <Calendar className="h-5 w-5 text-indigo-600" />
+          <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
+            <Calendar className="h-5 w-5 text-blue-600" />
           </div>
           <div>
             <p className="text-xs text-[hsl(var(--muted-foreground))]">
@@ -218,7 +218,7 @@ export function ReportDetail({ reportId }: ReportDetailProps) {
         {/* Planned Tasks */}
         <Card>
           <CardHeader className="border-b border-[hsl(var(--border))] py-4 px-6">
-            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-indigo-700 dark:text-indigo-400 flex items-center gap-2">
+            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-blue-700 dark:text-blue-400 flex items-center gap-2">
               <FileText className="h-4 w-4" />
               Tasks Planned for Next Week
             </CardTitle>

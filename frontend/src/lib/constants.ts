@@ -23,8 +23,7 @@ export const QUERY_KEYS = {
   projects: ["projects"] as const,
 
   // Dashboard
-  metrics: (weekStart: string) =>
-    ["dashboard", "metrics", weekStart] as const,
+  metrics: (weekStart: string) => ["dashboard", "metrics", weekStart] as const,
   submissionStatus: (weekStart: string) =>
     ["dashboard", "submission-status", weekStart] as const,
   tasksTrend: (weeks: number, userId?: string) =>
@@ -38,8 +37,7 @@ export const QUERY_KEYS = {
 
   // AI
   aiChat: ["ai", "chat"] as const,
-  weeklySummary: (weekStart: string) =>
-    ["ai", "summary", weekStart] as const,
+  weeklySummary: (weekStart: string) => ["ai", "summary", weekStart] as const,
 } as const;
 
 // ── Route Paths ──────────────────────────────────────────────────────────────

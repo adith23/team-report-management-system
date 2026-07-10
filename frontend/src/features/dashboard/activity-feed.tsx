@@ -16,7 +16,7 @@ interface ActivityFeedProps {
 
 const getAvatarBg = (name: string) => {
   const colors = [
-    "bg-[#5c59f0]", // Purple-Blue
+    "bg-blue-600", // Blue
     "bg-[#3b82f6]", // Blue
     "bg-[#8b5cf6]", // Purple
     "bg-[#06b6d4]", // Cyan

@@ -108,7 +108,7 @@ export function UsersPage() {
               size="sm"
               onClick={() => handleEditRoleClick(user)}
               disabled={isSelf}
-              className="text-slate-500 hover:text-indigo-600 h-8 px-2.5"
+              className="text-slate-500 hover:text-blue-600 h-8 px-2.5"
               title={isSelf ? "Cannot change your own role" : "Edit user role"}
             >
               <Edit2 className="h-3.5 w-3.5 mr-1" />
@@ -133,7 +133,7 @@ export function UsersPage() {
         </div>
         <Link
           href="/reports/new"
-          className="inline-flex items-center gap-1 bg-[#5c59f0] hover:bg-[#4b48d9] text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors shadow-md h-8"
+          className="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors shadow-md h-8"
         >
           <Plus className="h-3.5 w-3.5" />
           Submit Report

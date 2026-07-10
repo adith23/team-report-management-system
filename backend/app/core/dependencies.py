@@ -162,10 +162,10 @@ async def get_user_service(db: AsyncSession = Depends(get_db)) -> "UserService":
 
 
 async def get_project_service(db: AsyncSession = Depends(get_db)) -> "ProjectService":
-    from app.repositories import ProjectRepository
+    from app.repositories import ProjectRepository, UserRepository
     from app.services import ProjectService
 
-    return ProjectService(ProjectRepository(db))
+    return ProjectService(ProjectRepository(db), UserRepository(db))
 
 
 _embedding_service = None

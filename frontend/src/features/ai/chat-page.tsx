@@ -224,7 +224,7 @@ export function AIChatPage() {
         <div className="lg:col-span-8 flex flex-col bg-[#15161e] border border-[#21222d] rounded-2xl overflow-hidden h-[600px]">
           {/* Box Header */}
           <div className="px-6 py-4 border-b border-[#21222d] flex items-center gap-2">
-            <Bot className="h-4 w-4 text-[#5c59f0]" />
+            <Bot className="h-4 w-4 text-blue-500" />
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
               Conversational Q&A Assistant
             </h3>
@@ -240,7 +240,7 @@ export function AIChatPage() {
                   className={`flex gap-3.5 ${isAssistant ? "items-start" : "items-start justify-end"}`}
                 >
                   {isAssistant && (
-                    <div className="h-7 w-7 rounded-full bg-[#5c59f0]/10 flex items-center justify-center border border-[#5c59f0]/25 text-[#5c59f0] shrink-0 mt-0.5">
+                    <div className="h-7 w-7 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/25 text-blue-500 shrink-0 mt-0.5">
                       <Bot className="h-4 w-4" />
                     </div>
                   )}
@@ -249,7 +249,7 @@ export function AIChatPage() {
                     className={`max-w-[85%] rounded-2xl px-4 py-3 text-xs sm:text-sm ${
                       isAssistant
                         ? "bg-[#1c1d26] border border-[#2c2d3c] text-slate-200"
-                        : "bg-[#5c59f0] text-white rounded-tr-none shadow-md font-medium"
+                        : "bg-blue-600 text-white rounded-tr-none shadow-md font-medium"
                     }`}
                   >
                     <div className="space-y-1.5">
@@ -269,7 +269,7 @@ export function AIChatPage() {
             {/* AI responding typing loader */}
             {chatMutation.isPending && (
               <div className="flex gap-3.5 items-start">
-                <div className="h-7 w-7 rounded-full bg-[#5c59f0]/10 flex items-center justify-center border border-[#5c59f0]/25 text-[#5c59f0] shrink-0 mt-0.5">
+                <div className="h-7 w-7 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/25 text-blue-500 shrink-0 mt-0.5">
                   <Bot className="h-4 w-4" />
                 </div>
                 <div className="bg-[#1c1d26] border border-[#2c2d3c] rounded-2xl px-4 py-3 flex items-center gap-2">
@@ -295,7 +295,7 @@ export function AIChatPage() {
                   <button
                     key={idx}
                     onClick={() => handleSend(s)}
-                    className="text-[10px] font-semibold bg-[#1c1d26] hover:bg-[#5c59f0] text-slate-400 hover:text-white border border-[#2c2d3c] hover:border-[#5c59f0] rounded-full px-3 py-1.5 transition-all cursor-pointer"
+                    className="text-[10px] font-semibold bg-[#1c1d26] hover:bg-blue-600 text-slate-400 hover:text-white border border-[#2c2d3c] hover:border-blue-600 rounded-full px-3 py-1.5 transition-all cursor-pointer"
                   >
                     {s}
                   </button>
@@ -319,12 +319,12 @@ export function AIChatPage() {
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Ask questions about team activity, blockers, or workload..."
                 disabled={chatMutation.isPending}
-                className="flex-1 bg-[#1c1d26] border border-[#2c2d3c] text-white text-xs sm:text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-[#5c59f0]"
+                className="flex-1 bg-[#1c1d26] border border-[#2c2d3c] text-white text-xs sm:text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               <Button
                 type="submit"
                 disabled={!inputValue.trim() || chatMutation.isPending}
-                className="bg-[#5c59f0] hover:bg-[#4b48d9] text-white font-bold h-9 px-4 rounded-xl shrink-0 cursor-pointer transition-colors"
+                className="bg-blue-600 hover:bg-blue-500 text-white font-bold h-9 px-4 rounded-xl shrink-0 cursor-pointer transition-colors"
               >
                 <Send className="h-3.5 w-3.5" />
               </Button>
@@ -350,7 +350,7 @@ export function AIChatPage() {
             <select
               value={summaryWeek}
               onChange={(e) => setSummaryWeek(e.target.value)}
-              className="bg-[#1c1d26] border border-[#2c2d3c] text-white text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer flex-1"
+              className="bg-[#1c1d26] border border-[#2c2d3c] text-white text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer flex-1"
             >
               {weekOptions.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -390,7 +390,7 @@ export function AIChatPage() {
                 </p>
               </div>
             ) : (
-              <div className="space-y-2 select-text selection:bg-[#5c59f0]/40">
+              <div className="space-y-2 select-text selection:bg-blue-500/40">
                 {renderMarkdownContent(summaryData.summary)}
               </div>
             )}

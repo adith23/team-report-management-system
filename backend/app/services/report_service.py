@@ -74,6 +74,13 @@ class ReportService:
         if not project or not project.is_active:
             raise NotFoundException("Project", str(data.project_id))
 
+        # Verify assignment constraint if project has assignments
+        if project.assigned_users and author.role != UserRole.MANAGER:
+            if author.id not in [u.id for u in project.assigned_users]:
+                raise ForbiddenException(
+                    f"You are not assigned to project '{project.name}'."
+                )
+
         # 2. Normalize week dates
         monday, sunday = self._normalize_week(data.week_start)
 
@@ -179,6 +186,12 @@ class ReportService:
             project = await self._project_repo.get_by_id(data.project_id)
             if not project or not project.is_active:
                 raise NotFoundException("Project", str(data.project_id))
+            # Verify assignment constraint if project has assignments
+            if project.assigned_users and current_user.role != UserRole.MANAGER:
+                if current_user.id not in [u.id for u in project.assigned_users]:
+                    raise ForbiddenException(
+                        f"You are not assigned to project '{project.name}'."
+                    )
             update_data["project_id"] = data.project_id
 
         # 4. Handle week update
@@ -310,11 +323,12 @@ class ReportService:
         }
 
         await self._report_repo.update(report, update_payload)
-        
+
         # 6. semantic search indexing of submitted report
         updated_report = await self._report_repo.get_report_with_relations(report_id)
         if updated_report:
             import asyncio
+
             try:
                 # Resolve task types cleanly (checking string or enum matches)
                 tasks_completed = []
@@ -328,8 +342,16 @@ class ReportService:
 
                 report_dict = {
                     "user_id": str(updated_report.user_id),
-                    "user_name": updated_report.user.full_name if updated_report.user else "Unknown Member",
-                    "project_name": updated_report.project.name if updated_report.project else "Uncategorized",
+                    "user_name": (
+                        updated_report.user.full_name
+                        if updated_report.user
+                        else "Unknown Member"
+                    ),
+                    "project_name": (
+                        updated_report.project.name
+                        if updated_report.project
+                        else "Uncategorized"
+                    ),
                     "week_start": str(updated_report.week_start),
                     "week_end": str(updated_report.week_end),
                     "hours_worked": updated_report.hours_worked,
@@ -341,13 +363,19 @@ class ReportService:
                         for b in updated_report.blockers
                     ],
                 }
-                
+
                 # Execute fire-and-forget indexing task in event loop
                 asyncio.create_task(
-                    self._vector_service.upsert_report(str(updated_report.id), report_dict)
+                    self._vector_service.upsert_report(
+                        str(updated_report.id), report_dict
+                    )
                 )
             except Exception as index_err:
-                logger.error("Failed to enqueue vector index task for report %s: %s", report_id, str(index_err))
+                logger.error(
+                    "Failed to enqueue vector index task for report %s: %s",
+                    report_id,
+                    str(index_err),
+                )
 
         return updated_report
 

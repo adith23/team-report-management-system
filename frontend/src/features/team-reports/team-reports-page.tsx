@@ -82,7 +82,7 @@ export function TeamReportsPage() {
         </div>
         <Link
           href="/reports/new"
-          className="inline-flex items-center gap-1 bg-[#5c59f0] hover:bg-[#4b48d9] text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors shadow-md h-8"
+          className="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors shadow-md h-8"
         >
           <Plus className="h-3.5 w-3.5" />
           Submit Report
@@ -103,7 +103,7 @@ export function TeamReportsPage() {
               setWeekStart(e.target.value);
               setPage(1);
             }}
-            className="bg-[#1c1d26] border border-[#2c2d3c] text-white text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer min-w-[180px]"
+            className="bg-[#1c1d26] border border-[#2c2d3c] text-white text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer min-w-[180px]"
           >
             {weekOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -119,7 +119,7 @@ export function TeamReportsPage() {
               setSelectedUserId(e.target.value);
               setPage(1);
             }}
-            className="bg-[#1c1d26] border border-[#2c2d3c] text-white text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer min-w-[140px]"
+            className="bg-[#1c1d26] border border-[#2c2d3c] text-white text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer min-w-[140px]"
           >
             <option value="">All Members</option>
             {activeUsers.map((u) => (
@@ -136,7 +136,7 @@ export function TeamReportsPage() {
               setSelectedProjectId(e.target.value);
               setPage(1);
             }}
-            className="bg-[#1c1d26] border border-[#2c2d3c] text-white text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer min-w-[140px]"
+            className="bg-[#1c1d26] border border-[#2c2d3c] text-white text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer min-w-[140px]"
           >
             <option value="">All Projects</option>
             {projects.map((p) => (
@@ -153,7 +153,7 @@ export function TeamReportsPage() {
               setSelectedStatus(e.target.value);
               setPage(1);
             }}
-            className="bg-[#1c1d26] border border-[#2c2d3c] text-white text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer min-w-[120px]"
+            className="bg-[#1c1d26] border border-[#2c2d3c] text-white text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer min-w-[120px]"
           >
             <option value="">All Statuses</option>
             <option value={ReportStatus.DRAFT}>Draft</option>

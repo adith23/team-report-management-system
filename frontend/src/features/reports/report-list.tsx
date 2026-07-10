@@ -36,7 +36,7 @@ export function ReportListPage() {
         </div>
         <Link
           href={ROUTES.NEW_REPORT}
-          className="inline-flex items-center gap-1 bg-[#5c59f0] hover:bg-[#4b48d9] text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors shadow-md h-8"
+          className="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors shadow-md h-8"
         >
           <Plus className="h-3.5 w-3.5" />
           New Report
@@ -85,7 +85,7 @@ export function ReportListPage() {
           action={
             <Link
               href={ROUTES.NEW_REPORT}
-              className="inline-flex items-center gap-1 bg-[#5c59f0] hover:bg-[#4b48d9] text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors shadow-md"
+              className="inline-flex items-center gap-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors shadow-md"
             >
               Create Report
             </Link>

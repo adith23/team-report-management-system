@@ -31,7 +31,7 @@ const CustomTooltip = ({ active, payload }: any) => {
     return (
       <div className="bg-[#1c1d26] border border-[#2c2d3c] p-3 rounded-lg shadow-lg text-xs space-y-1">
         <p className="font-semibold text-slate-300">{data.project_name}</p>
-        <p className="text-[#5c59f0] font-medium">
+        <p className="text-blue-500 font-medium">
           Hours Logged: {data.hours} hrs
         </p>
       </div>
@@ -137,7 +137,7 @@ export function WorkloadChart({
                     {workloadData.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
-                        fill={entry.project_color || "#5c59f0"}
+                        fill={entry.project_color || "#3b82f6"}
                       />
                     ))}
                   </Bar>

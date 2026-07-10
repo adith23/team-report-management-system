@@ -96,7 +96,7 @@ export function RoleEditModal({ open, onClose, user }: RoleEditModalProps) {
             onClick={handleSave}
             loading={isSubmitting}
             disabled={isSelf}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white"
+            className="bg-blue-600 hover:bg-blue-500 text-white"
           >
             Save Changes
           </Button>

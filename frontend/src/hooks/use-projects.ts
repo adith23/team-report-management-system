@@ -5,7 +5,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
 import { QUERY_KEYS, API_ENDPOINTS } from "@/lib/constants";
-import type { Project, ProjectCreate, ProjectUpdate, MessageResponse } from "@/types";
+import type { Project, ProjectCreate, ProjectUpdate, ProjectAssignmentRequest, MessageResponse } from "@/types";
 
 /**
  * Fetch all active projects.
@@ -56,6 +56,21 @@ export function useDeleteProject() {
 
   return useMutation<MessageResponse, Error, string>({
     mutationFn: (id) => apiClient.delete<MessageResponse>(API_ENDPOINTS.PROJECT(id)),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.projects });
+    },
+  });
+}
+
+/**
+ * Assign team members to a project (manager only).
+ */
+export function useAssignProjectMembers(id: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation<Project, Error, ProjectAssignmentRequest>({
+    mutationFn: (data) =>
+      apiClient.post<Project>(`${API_ENDPOINTS.PROJECT(id)}/assign`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.projects });
     },

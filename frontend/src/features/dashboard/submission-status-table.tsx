@@ -97,7 +97,7 @@ export function SubmissionStatusTable({
                 if (report) {
                   projectName = report.project_name || "—";
                   const matchingProj = projects.find((p) => p.name === report.project_name);
-                  projectColor = matchingProj?.color_hex || "#5c59f0";
+                  projectColor = matchingProj?.color_hex || "#3b82f6";
                   hoursStr = report.hours_worked !== null ? `${report.hours_worked} hrs` : "—";
                   tasksCompletedCount = report.tasks_completed?.length || 0;
                   openBlockers = report.blockers?.filter((b) => !b.is_resolved).length || 0;
@@ -187,7 +187,7 @@ export function SubmissionStatusTable({
                       {report ? (
                         <Link
                           href={`/reports/${report.id}`}
-                          className="inline-flex items-center bg-[#5c59f0] hover:bg-[#4b48d9] text-white text-[10px] font-bold px-3 py-1 rounded transition-colors shadow-sm"
+                          className="inline-flex items-center bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold px-3 py-1 rounded transition-colors shadow-sm"
                         >
                           View
                         </Link>

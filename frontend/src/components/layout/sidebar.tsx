@@ -16,7 +16,7 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
-  BarChart3,
+  Layers,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth-store";
@@ -77,17 +77,20 @@ export function Sidebar() {
         )}
       >
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[hsl(var(--primary))]">
-          <BarChart3 className="h-5 w-5 text-[hsl(var(--primary-foreground))]" />
+          <Layers className="h-5 w-5 text-[hsl(var(--primary-foreground))]" />
         </div>
         {!sidebarCollapsed && (
           <span className="text-lg font-bold tracking-tight truncate">
-            Team Reports
+            TaskFlow
           </span>
         )}
       </div>
 
       {/* ── Navigation Items ─────────────────────────────────────────────── */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Main navigation">
+      <nav
+        className="flex-1 overflow-y-auto px-3 py-4"
+        aria-label="Main navigation"
+      >
         <ul className="space-y-1">
           {visibleItems.map((item) => {
             const Icon = iconMap[item.icon] || FileText;
@@ -117,7 +120,9 @@ export function Sidebar() {
                         : "text-[hsl(var(--muted-foreground))] group-hover:text-[hsl(var(--foreground))]",
                     )}
                   />
-                  {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
+                  {!sidebarCollapsed && (
+                    <span className="truncate">{item.label}</span>
+                  )}
                 </Link>
               </li>
             );
@@ -138,9 +143,7 @@ export function Sidebar() {
             <Avatar name={user.full_name} size="sm" />
             {!sidebarCollapsed && (
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">
-                  {user.full_name}
-                </p>
+                <p className="text-sm font-medium truncate">{user.full_name}</p>
                 <p className="text-xs text-[hsl(var(--muted-foreground))] truncate">
                   {user.email}
                 </p>
@@ -178,7 +181,9 @@ export function Sidebar() {
               "rounded-lg p-2 text-[hsl(var(--muted-foreground))]",
               "transition-colors hover:bg-[hsl(var(--accent))] hover:text-[hsl(var(--foreground))]",
             )}
-            aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={
+              sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"
+            }
             title={sidebarCollapsed ? "Expand" : "Collapse"}
           >
             {sidebarCollapsed ? (
