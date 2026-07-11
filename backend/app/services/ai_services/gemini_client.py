@@ -1,40 +1,36 @@
 """
-Gemini concrete LLM strategy implementation.
-
-Utilizes the google-genai or google-generativeai package to generate responses from Google Gemini models.
+Gemini concrete LLM client implementation.
 """
 
 import logging
 import google.generativeai as genai
 
 from app.config import settings
-from app.services.ai.llm_strategy import LLMStrategy
+from app.services.ai_services.base_client import BaseLLMClient
 
 logger = logging.getLogger(__name__)
 
 
-class GeminiStrategy(LLMStrategy):
+class GeminiClient(BaseLLMClient):
     """
-    Google Gemini implementation of the LLMStrategy.
+    Google Gemini implementation of the BaseLLMClient.
     """
 
     def __init__(self) -> None:
         self._api_key = settings.GEMINI_API_KEY
         if self._api_key:
             genai.configure(api_key=self._api_key)
-            # Use gemini-1.5-flash for fast, high-context structured processing
             self._model = genai.GenerativeModel("gemini-3.1-flash-lite")
         else:
             self._model = None
             logger.warning(
-                "GEMINI_API_KEY is not set. The Gemini Strategy will run in MOCK mode."
+                "GEMINI_API_KEY is not set. The Gemini Client will run in MOCK mode."
             )
 
     async def generate(self, system_prompt: str, user_message: str) -> str:
         """
         Generate a text response using Google Gemini API.
         """
-        # If no client (no API key configured), return a mock response
         if not self._model:
             return (
                 "⚠️ **[MOCK MODE]** Gemini API key is not configured.\n\n"
@@ -45,14 +41,12 @@ class GeminiStrategy(LLMStrategy):
             )
 
         try:
-            # Combine system prompt and user message since Gemini 1.5 system instructions
-            # can be passed differently, but combining is universally safe for simple text generation.
             prompt = f"System Instructions:\n{system_prompt}\n\nUser Message:\n{user_message}"
 
             response = await self._model.generate_content_async(
                 prompt,
                 generation_config=genai.GenerationConfig(
-                    temperature=0.3,  # Keep deterministic
+                    temperature=0.3,
                     max_output_tokens=1000,
                 ),
             )

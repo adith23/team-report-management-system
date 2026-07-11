@@ -69,12 +69,16 @@ class DashboardService:
             total_team_members=active_users_count,
         )
 
-    async def get_submission_status(self, week_start: date) -> list[SubmissionStatusItem]:
+    async def get_submission_status(
+        self, week_start: date
+    ) -> list[SubmissionStatusItem]:
         """
         Retrieve report submission status (submitted, late, pending) for every active user.
         """
         monday = week_start - timedelta(days=week_start.weekday())
-        active_users = await self._user_repo.get_all_active(limit=1000)  # Safe upper limit for team size
+        active_users = await self._user_repo.get_all_active(
+            limit=1000
+        )  # Safe upper limit for team size
 
         status_items = await self._report_repo.get_submission_status_for_week(
             week_start=monday, active_users=active_users
@@ -93,12 +97,16 @@ class DashboardService:
         )
         return [TaskTrendPoint(**row) for row in trend_rows]
 
-    async def get_workload_distribution(self, week_start: date) -> list[WorkloadDistribution]:
+    async def get_workload_distribution(
+        self, week_start: date
+    ) -> list[WorkloadDistribution]:
         """
         Retrieve task workload distribution by project for a given week.
         """
         monday = week_start - timedelta(days=week_start.weekday())
-        workload_rows = await self._report_repo.get_workload_distribution(week_start=monday)
+        workload_rows = await self._report_repo.get_workload_distribution(
+            week_start=monday
+        )
         return [WorkloadDistribution(**row) for row in workload_rows]
 
     async def get_recent_activity(self, limit: int = 10) -> list[RecentActivity]:

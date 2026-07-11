@@ -1,17 +1,13 @@
 """
-Abstract LLM strategy interface.
-
-Enables the Strategy Pattern for swapping out AI model providers
-(e.g., OpenAI, Anthropic, local runner) without changing
-the core AIService business logic.
+Abstract LLM client interface.
 """
 
 from abc import ABC, abstractmethod
 
 
-class LLMStrategy(ABC):
+class BaseLLMClient(ABC):
     """
-    Abstract strategy defining the common interface for all LLM providers.
+    Abstract client defining the common interface for all LLM providers.
     """
 
     @abstractmethod

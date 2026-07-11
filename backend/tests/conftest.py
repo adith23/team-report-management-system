@@ -25,7 +25,7 @@ from app.models.base import Base
 from app.models.user import User
 from app.models.project import Project
 
-# ── Test Database URL ────────────────────────────────────────────
+# Test Database URL
 # In-memory async SQLite database. Avoids Neon/Postgres dependencies for tests.
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
@@ -42,7 +42,7 @@ test_session_factory = async_sessionmaker(
 )
 
 
-# ── Pytest Asyncio Configuration ─────────────────────────────────
+# Pytest Asyncio Configuration
 @pytest.fixture(scope="session")
 def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
     """Create a session-scoped event loop for async fixtures."""
@@ -51,7 +51,7 @@ def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
     loop.close()
 
 
-# ── Database Schema Setup ────────────────────────────────────────
+# Database Schema Setup
 @pytest_asyncio.fixture(autouse=True)
 async def initialize_db_schema() -> AsyncGenerator[None, None]:
     """
@@ -65,7 +65,7 @@ async def initialize_db_schema() -> AsyncGenerator[None, None]:
         await conn.run_sync(Base.metadata.drop_all)
 
 
-# ── Database Session Fixture ─────────────────────────────────────
+# Database Session Fixture
 @pytest_asyncio.fixture
 async def db_session() -> AsyncGenerator[AsyncSession, None]:
     """
@@ -80,19 +80,20 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
             await session.rollback()
 
 
-# ── Dependency Override ──────────────────────────────────────────
+# Dependency Override
 @pytest.fixture(autouse=True)
 def override_db_dependency(db_session: AsyncSession) -> None:
     """
     Injects the test session into FastAPI dependencies.
     """
+
     async def _get_test_db() -> AsyncGenerator[AsyncSession, None]:
         yield db_session
 
     app.dependency_overrides[get_db] = _get_test_db
 
 
-# ── Client Fixtures ──────────────────────────────────────────────
+# Client Fixtures
 @pytest_asyncio.fixture
 async def client() -> AsyncGenerator[AsyncClient, None]:
     """
@@ -102,7 +103,7 @@ async def client() -> AsyncGenerator[AsyncClient, None]:
         yield ac
 
 
-# ── User Seed Fixtures ───────────────────────────────────────────
+# User Seed Fixtures
 @pytest_asyncio.fixture
 async def team_member_user(db_session: AsyncSession) -> User:
     """Create a standard TEAM_MEMBER user."""
@@ -133,7 +134,7 @@ async def manager_user(db_session: AsyncSession) -> User:
     return user
 
 
-# ── Authenticated Clients ────────────────────────────────────────
+# Authenticated Clients
 @pytest_asyncio.fixture
 async def member_client(team_member_user: User) -> AsyncGenerator[AsyncClient, None]:
     """
@@ -162,7 +163,7 @@ async def manager_client(manager_user: User) -> AsyncGenerator[AsyncClient, None
         yield ac
 
 
-# ── Seed Data Fixtures ───────────────────────────────────────────
+# Seed Data Fixtures
 @pytest_asyncio.fixture
 async def active_project(db_session: AsyncSession, manager_user: User) -> Project:
     """Create a default active project category."""

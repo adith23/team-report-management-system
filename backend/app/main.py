@@ -20,6 +20,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
+
+from app.routers.api_routes import api_router
 from app.config import settings
 from app.core.database import engine
 from app.core.exceptions import AppException, app_exception_handler
@@ -28,7 +30,7 @@ from app.middleware.request_logging import RequestLoggingMiddleware
 logger = logging.getLogger(__name__)
 
 
-# ── Lifespan ─────────────────────────────────────────────────────
+# Lifespan
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: ARG001
     """
@@ -41,7 +43,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: ARG001
     Shutdown:
         - Dispose the database engine (close all pooled connections).
     """
-    # ── Startup ──────────────────────────────────────────────
+    # Startup
     logger.info("Starting %s...", settings.APP_NAME)
     try:
         async with engine.begin() as conn:
@@ -53,13 +55,13 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:  # noqa: ARG001
 
     yield
 
-    # ── Shutdown ─────────────────────────────────────────────
+    # Shutdown
     logger.info("Shutting down %s...", settings.APP_NAME)
     await engine.dispose()
     logger.info("Database connections closed.")
 
 
-# ── App Factory ──────────────────────────────────────────────────
+# App Factory
 def create_app() -> FastAPI:
     """
     FastAPI application factory.
@@ -82,7 +84,7 @@ def create_app() -> FastAPI:
         redoc_url="/redoc" if settings.DEBUG else None,
     )
 
-    # ── CORS Middleware ──────────────────────────────────────
+    # CORS Middleware
     # allow_credentials=True is REQUIRED for HttpOnly cookie auth.
     # The browser must include cookies in cross-origin requests.
     app.add_middleware(
@@ -93,31 +95,16 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # ── Request Logging Middleware ────────────────────────────
+    # Request Logging Middleware
     app.add_middleware(RequestLoggingMiddleware)
 
-    # ── Exception Handlers ───────────────────────────────────
+    # Exception Handlers
     app.add_exception_handler(AppException, app_exception_handler)
 
-    # ── API Routers ──────────────────────────────────────────
-    from app.routers import (
-        auth_router,
-        user_router,
-        report_router,
-        project_router,
-        dashboard_router,
-        ai_router,
-    )
+    # Mount API routers
+    app.include_router(api_router)
 
-    # Mount API routers under prefix /api/v1
-    app.include_router(auth_router, prefix="/api/v1")
-    app.include_router(user_router, prefix="/api/v1")
-    app.include_router(report_router, prefix="/api/v1")
-    app.include_router(project_router, prefix="/api/v1")
-    app.include_router(dashboard_router, prefix="/api/v1")
-    app.include_router(ai_router, prefix="/api/v1")
-
-    # ── Health Check ─────────────────────────────────────────
+    # Health Check
     @app.get(
         "/health",
         tags=["Health"],
@@ -140,6 +127,6 @@ def create_app() -> FastAPI:
     return app
 
 
-# ── Application Instance ─────────────────────────────────────────
+# Application Instance
 # This is the ASGI application that uvicorn serves.
 app = create_app()

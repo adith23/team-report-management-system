@@ -32,7 +32,7 @@ class Project(Base, UUIDPrimaryKeyMixin, TimestampMixin):
 
     __tablename__ = "projects"
 
-    # ── Project Info ─────────────────────────────────────────────
+    # Project Info
     name: Mapped[str] = mapped_column(
         String(255),
         unique=True,
@@ -52,7 +52,7 @@ class Project(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         comment="Hex color for chart visualization (e.g. #6366f1)",
     )
 
-    # ── Status ───────────────────────────────────────────────────
+    # Status
     is_active: Mapped[bool] = mapped_column(
         Boolean,
         default=True,
@@ -60,14 +60,14 @@ class Project(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         comment="Soft-delete flag — inactive projects hidden from dropdown",
     )
 
-    # ── Foreign Keys ─────────────────────────────────────────────
+    # Foreign Keys
     created_by: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id"),
         nullable=False,
         comment="Manager who created this project",
     )
 
-    # ── Relationships ────────────────────────────────────────────
+    # Relationships
     creator: Mapped["User"] = relationship(
         "User",
         back_populates="created_projects",

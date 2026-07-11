@@ -40,7 +40,6 @@ class ProjectRepository(BaseRepository[Project]):
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
-
     async def get_by_name(self, name: str) -> Project | None:
         """
         Find a project by its name.
@@ -105,9 +104,7 @@ class ProjectRepository(BaseRepository[Project]):
         from app.models.user_project import UserProjectAssignment
 
         # Subquery to check if the project has any assignments
-        has_assignments = exists().where(
-            UserProjectAssignment.project_id == Project.id
-        )
+        has_assignments = exists().where(UserProjectAssignment.project_id == Project.id)
         # Subquery to check if this user is assigned to this project
         is_assigned = exists().where(
             and_(
@@ -141,8 +138,6 @@ class ProjectRepository(BaseRepository[Project]):
         Returns:
             Count of active projects.
         """
-        stmt = select(func.count(Project.id)).where(
-            Project.is_active.is_(True)
-        )
+        stmt = select(func.count(Project.id)).where(Project.is_active.is_(True))
         result = await self._session.execute(stmt)
         return result.scalar_one()

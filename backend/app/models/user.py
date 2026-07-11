@@ -29,7 +29,7 @@ class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):
 
     __tablename__ = "users"
 
-    # ── Profile ──────────────────────────────────────────────────
+    # Profile
     email: Mapped[str] = mapped_column(
         String(255),
         unique=True,
@@ -43,14 +43,14 @@ class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         comment="User's display name",
     )
 
-    # ── Authentication ───────────────────────────────────────────
+    # Authentication
     hashed_password: Mapped[str] = mapped_column(
         String(1024),
         nullable=False,
         comment="Argon2-hashed password",
     )
 
-    # ── Authorization ────────────────────────────────────────────
+    # Authorization
     role: Mapped[UserRole] = mapped_column(
         default=UserRole.TEAM_MEMBER,
         nullable=False,
@@ -58,7 +58,7 @@ class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         comment="User role: TEAM_MEMBER or MANAGER",
     )
 
-    # ── Status ───────────────────────────────────────────────────
+    # Status
     is_active: Mapped[bool] = mapped_column(
         Boolean,
         default=True,
@@ -66,7 +66,7 @@ class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         comment="Soft-delete flag — inactive users cannot login",
     )
 
-    # ── Relationships ────────────────────────────────────────────
+    # Relationships
     reports: Mapped[list["WeeklyReport"]] = relationship(
         "WeeklyReport",
         back_populates="user",

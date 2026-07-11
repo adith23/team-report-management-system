@@ -12,7 +12,11 @@ import uuid
 from typing import Sequence
 
 from app.core.enums import UserRole
-from app.core.exceptions import ForbiddenException, NotFoundException, BadRequestException
+from app.core.exceptions import (
+    ForbiddenException,
+    NotFoundException,
+    BadRequestException,
+)
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
 from app.schemas.user import UserUpdate, UserRoleUpdate
@@ -28,7 +32,9 @@ class UserService:
     def __init__(self, user_repo: UserRepository) -> None:
         self._user_repo = user_repo
 
-    async def get_all_users(self, skip: int = 0, limit: int = 100) -> tuple[Sequence[User], int]:
+    async def get_all_users(
+        self, skip: int = 0, limit: int = 100
+    ) -> tuple[Sequence[User], int]:
         """
         Fetch all active users and total count. For the admin user list.
         """

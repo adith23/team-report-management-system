@@ -47,7 +47,7 @@ class WeeklyReport(Base, UUIDPrimaryKeyMixin, TimestampMixin):
 
     __tablename__ = "weekly_reports"
 
-    # ── Table-level Constraints ──────────────────────────────────
+    # Table-level Constraints
     __table_args__ = (
         UniqueConstraint(
             "user_id",
@@ -65,7 +65,7 @@ class WeeklyReport(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         ),
     )
 
-    # ── Foreign Keys ─────────────────────────────────────────────
+    # Foreign Keys
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id"),
         nullable=False,
@@ -79,8 +79,7 @@ class WeeklyReport(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         comment="Project/category this report is for",
     )
 
-
-    # ── Week Range ───────────────────────────────────────────────
+    # Week Range
     week_start: Mapped[date] = mapped_column(
         Date,
         nullable=False,
@@ -93,7 +92,7 @@ class WeeklyReport(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         comment="Sunday of the reporting week",
     )
 
-    # ── Report Status ────────────────────────────────────────────
+    # Report Status
     status: Mapped[ReportStatus] = mapped_column(
         default=ReportStatus.DRAFT,
         nullable=False,
@@ -101,7 +100,7 @@ class WeeklyReport(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         comment="Report lifecycle state: DRAFT, SUBMITTED, or LATE",
     )
 
-    # ── Optional Fields ──────────────────────────────────────────
+    # Optional Fields
     hours_worked: Mapped[Decimal | None] = mapped_column(
         Numeric(precision=5, scale=2),
         nullable=True,
@@ -113,13 +112,13 @@ class WeeklyReport(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         comment="Optional notes or links",
     )
 
-    # ── Submission Tracking ──────────────────────────────────────
+    # Submission Tracking
     submitted_at: Mapped[datetime | None] = mapped_column(
         nullable=True,
         comment="Timestamp when report was submitted (null if draft)",
     )
 
-    # ── Relationships ────────────────────────────────────────────
+    # Relationships
     user: Mapped["User"] = relationship(
         "User",
         back_populates="reports",

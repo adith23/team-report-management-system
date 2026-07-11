@@ -39,7 +39,7 @@ class ReportRepository(BaseRepository[WeeklyReport]):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(WeeklyReport, session)
 
-    # ── Report Queries ───────────────────────────────────────────
+    # Report Queries
     async def get_by_user_and_week(
         self,
         user_id: uuid.UUID,
@@ -61,7 +61,6 @@ class ReportRepository(BaseRepository[WeeklyReport]):
         )
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
-
 
     async def get_report_with_relations(
         self,
@@ -93,9 +92,8 @@ class ReportRepository(BaseRepository[WeeklyReport]):
         Get a user's own reports, paginated, ordered by week descending.
         """
         # Count query
-        count_stmt = (
-            select(func.count(WeeklyReport.id))
-            .where(WeeklyReport.user_id == user_id)
+        count_stmt = select(func.count(WeeklyReport.id)).where(
+            WeeklyReport.user_id == user_id
         )
         count_result = await self._session.execute(count_stmt)
         total = count_result.scalar_one()
@@ -152,37 +150,27 @@ class ReportRepository(BaseRepository[WeeklyReport]):
         total = count_result.scalar_one()
 
         # Data query
-        stmt = (
-            select(WeeklyReport)
-            .options(
-                selectinload(WeeklyReport.user),
-                selectinload(WeeklyReport.project),
-                selectinload(WeeklyReport.tasks),
-                selectinload(WeeklyReport.blockers),
-            )
+        stmt = select(WeeklyReport).options(
+            selectinload(WeeklyReport.user),
+            selectinload(WeeklyReport.project),
+            selectinload(WeeklyReport.tasks),
+            selectinload(WeeklyReport.blockers),
         )
         if conditions:
             stmt = stmt.where(and_(*conditions))
-        stmt = (
-            stmt.order_by(WeeklyReport.week_start.desc())
-            .offset(skip)
-            .limit(limit)
-        )
+        stmt = stmt.order_by(WeeklyReport.week_start.desc()).offset(skip).limit(limit)
 
         result = await self._session.execute(stmt)
         reports = result.scalars().all()
 
         return reports, total
 
-    # ── Dashboard Aggregation Queries ────────────────────────────
+    # Dashboard Aggregation Queries
     async def count_reports_for_week(self, week_start: date) -> int:
-        stmt = (
-            select(func.count(WeeklyReport.id))
-            .where(
-                and_(
-                    WeeklyReport.week_start == week_start,
-                    WeeklyReport.status != ReportStatus.DRAFT,
-                )
+        stmt = select(func.count(WeeklyReport.id)).where(
+            and_(
+                WeeklyReport.week_start == week_start,
+                WeeklyReport.status != ReportStatus.DRAFT,
             )
         )
         result = await self._session.execute(stmt)
@@ -202,14 +190,9 @@ class ReportRepository(BaseRepository[WeeklyReport]):
         week_start: date,
         active_users: Sequence[User],
     ) -> list[dict]:
-        stmt = (
-            select(
-                WeeklyReport.user_id,
-                WeeklyReport.status,
-                WeeklyReport.submitted_at
-            )
-            .where(WeeklyReport.week_start == week_start)
-        )
+        stmt = select(
+            WeeklyReport.user_id, WeeklyReport.status, WeeklyReport.submitted_at
+        ).where(WeeklyReport.week_start == week_start)
         result = await self._session.execute(stmt)
         reports = result.all()
 
@@ -222,7 +205,7 @@ class ReportRepository(BaseRepository[WeeklyReport]):
             ):
                 user_reports[row.user_id] = {
                     "status": row.status,
-                    "submitted_at": row.submitted_at
+                    "submitted_at": row.submitted_at,
                 }
 
         status_list = []
@@ -238,12 +221,14 @@ class ReportRepository(BaseRepository[WeeklyReport]):
                 status = "submitted"
                 submitted_at = report_data["submitted_at"]
 
-            status_list.append({
-                "user_id": user.id,
-                "user_full_name": user.full_name,
-                "status": status,
-                "submitted_at": submitted_at,
-            })
+            status_list.append(
+                {
+                    "user_id": user.id,
+                    "user_full_name": user.full_name,
+                    "status": status,
+                    "submitted_at": submitted_at,
+                }
+            )
 
         return status_list
 
@@ -331,12 +316,16 @@ class ReportRepository(BaseRepository[WeeklyReport]):
             else:
                 action = "updated"
 
-            activities.append({
-                "report_id": report.id,
-                "user_full_name": report.user.full_name,
-                "project_name": report.project.name if report.project else "Unknown",
-                "action": action,
-                "timestamp": report.updated_at,
-            })
+            activities.append(
+                {
+                    "report_id": report.id,
+                    "user_full_name": report.user.full_name,
+                    "project_name": (
+                        report.project.name if report.project else "Unknown"
+                    ),
+                    "action": action,
+                    "timestamp": report.updated_at,
+                }
+            )
 
         return activities
