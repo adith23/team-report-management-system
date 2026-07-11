@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Users Route Page — Secure user management and admin panel for managers
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { Metadata } from "next";
 import { AuthGuard } from "@/features/auth/auth-guard";

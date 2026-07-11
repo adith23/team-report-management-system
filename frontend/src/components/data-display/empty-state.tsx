@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Empty State — Placeholder when no data is available
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { cn } from "@/lib/utils";
 import { Inbox } from "lucide-react";

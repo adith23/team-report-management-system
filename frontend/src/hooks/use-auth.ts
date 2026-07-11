@@ -1,10 +1,7 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Auth Hooks — TanStack Query hooks for authentication operations
-// ──────────────────────────────────────────────────────────────────────────────
 //
 // These hooks wrap the auth API endpoints and synchronize server state
 // (TanStack Query cache) with client state (Zustand auth store).
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";

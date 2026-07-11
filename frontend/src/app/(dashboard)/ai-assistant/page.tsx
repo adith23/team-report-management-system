@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // AI Assistant Page Route — Entry point for manager AI chat panel
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { AIChatPage } from "@/features/ai/chat-page";
 

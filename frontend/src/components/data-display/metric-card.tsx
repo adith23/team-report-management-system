@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Metric Card — Dashboard KPI card with icon, value, label, and trend
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { cn } from "@/lib/utils";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";

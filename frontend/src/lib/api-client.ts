@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // API Client — Axios instance with cookie credentials and error interceptors
-// ──────────────────────────────────────────────────────────────────────────────
 
 import axios, { type AxiosError } from "axios";
 
@@ -25,7 +23,7 @@ export const axiosInstance = axios.create({
   timeout: 30_000, // 30s timeout
 });
 
-// ── Response Interceptor ─────────────────────────────────────────────────────
+// Response Interceptor
 // Extracts `response.data` so consumers receive data directly,
 // and transforms errors into a consistent `Error` shape.
 axiosInstance.interceptors.response.use(
@@ -50,7 +48,7 @@ axiosInstance.interceptors.response.use(
   },
 );
 
-// ── Typed API Client ─────────────────────────────────────────────────────────
+// Typed API Client
 // Thin wrapper providing typed generic methods over the axios instance.
 // Usage: `apiClient.get<User>("/auth/me")` → `Promise<User>`
 export const apiClient = {

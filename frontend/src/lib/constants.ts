@@ -1,11 +1,9 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Constants — Application-wide constants, query keys, routes, and config maps
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { UserRole, ReportStatus } from "@/types/common";
 import type { ReportFilters } from "@/types";
 
-// ── TanStack Query Keys ──────────────────────────────────────────────────────
+// TanStack Query Keys
 // Centralized query key factory. Using `as const` ensures type safety
 // and enables precise cache invalidation.
 
@@ -40,7 +38,7 @@ export const QUERY_KEYS = {
   weeklySummary: (weekStart: string) => ["ai", "summary", weekStart] as const,
 } as const;
 
-// ── Route Paths ──────────────────────────────────────────────────────────────
+// Route Paths
 // Centralized route definitions prevent hardcoded strings and enable
 // type-safe navigation.
 
@@ -58,7 +56,7 @@ export const ROUTES = {
   AI_ASSISTANT: "/ai-assistant",
 } as const;
 
-// ── Navigation Items ─────────────────────────────────────────────────────────
+// Navigation Items
 // Role-aware navigation configuration consumed by the sidebar component.
 // `icon` maps to Lucide icon component names.
 
@@ -108,7 +106,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   },
 ] as const;
 
-// ── Report Status Display Configuration ──────────────────────────────────────
+// Report Status Display Configuration
 // Maps each ReportStatus to its label and Tailwind color classes for the
 // status badge component.
 
@@ -138,12 +136,12 @@ export const STATUS_CONFIG: Record<ReportStatus, StatusConfig> = {
   },
 };
 
-// ── Pagination Defaults ──────────────────────────────────────────────────────
+// Pagination Defaults
 
 export const DEFAULT_PAGE_SIZE = 10;
 export const DEFAULT_PAGE = 1;
 
-// ── API Endpoints ────────────────────────────────────────────────────────────
+// API Endpoints
 // Centralized API endpoint strings for use with the API client.
 
 export const API_ENDPOINTS = {

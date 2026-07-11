@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // My Reports Route Page — Lists reports created by the current user
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { Metadata } from "next";
 import { ReportListPage } from "@/features/reports";

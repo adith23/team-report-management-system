@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Mobile Nav — Navigation drawer for mobile viewports
-// ──────────────────────────────────────────────────────────────────────────────
 
 "use client";
 
@@ -26,7 +24,7 @@ import { NAV_ITEMS } from "@/lib/constants";
 import { Avatar } from "@/components/ui/avatar";
 import type { UserRole } from "@/types/common";
 
-// ── Icon Map ─────────────────────────────────────────────────────────────────
+// Icon Map
 
 const iconMap: Record<string, React.ElementType> = {
   FileText,

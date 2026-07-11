@@ -1,11 +1,8 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Providers — Client-side context providers wrapping the application
-// ──────────────────────────────────────────────────────────────────────────────
 //
 // This file must be a client component since TanStack Query and toast providers
 // require React context and hooks. It is imported by the root layout (server
 // component) to wrap the entire application.
-// ──────────────────────────────────────────────────────────────────────────────
 
 "use client";
 

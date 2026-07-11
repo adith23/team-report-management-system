@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Login Page — Sign-in route endpoint
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { Metadata } from "next";
 import { LoginForm } from "@/features/auth/login-form";

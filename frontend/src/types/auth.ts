@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Auth Types — User entity and authentication request/response shapes
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { UserRole } from "./common";
 

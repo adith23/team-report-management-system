@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Modal — Dialog overlay with keyboard support and animations
-// ──────────────────────────────────────────────────────────────────────────────
 
 "use client";
 
@@ -57,7 +55,7 @@ export function Modal({
   const overlayRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  // ── Escape key handler ─────────────────────────────────────────────────
+  // Escape key handler
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -80,7 +78,7 @@ export function Modal({
     };
   }, [open, handleKeyDown]);
 
-  // ── Focus trap: focus the content on open ──────────────────────────────
+  // Focus trap: focus the content on open
   useEffect(() => {
     if (open && contentRef.current) {
       contentRef.current.focus();
@@ -163,7 +161,7 @@ export function Modal({
   );
 }
 
-// ── Modal sub-components ─────────────────────────────────────────────────────
+// Modal sub-components
 
 export function ModalFooter({
   children,

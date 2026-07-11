@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // TanStack Query Client — Centralized QueryClient configuration
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { QueryClient } from "@tanstack/react-query";
 

@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // LoginForm — Component for signing in to the system
-// ──────────────────────────────────────────────────────────────────────────────
 
 "use client";
 
@@ -15,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { ROUTES } from "@/lib/constants";
 
-// ── Zod Validation Schema ────────────────────────────────────────────────────
+// Zod Validation Schema
 const loginSchema = zod.object({
   email: zod
     .string()

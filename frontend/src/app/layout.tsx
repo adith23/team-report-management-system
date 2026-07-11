@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Root Layout — Application shell with providers, fonts, and metadata
-// ──────────────────────────────────────────────────────────────────────────────
 
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";

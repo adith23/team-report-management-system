@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // ProjectFormModal — Modal form to create or edit a project
-// ──────────────────────────────────────────────────────────────────────────────
 
 "use client";
 
@@ -18,7 +16,7 @@ import { useUsers } from "@/hooks/use-users";
 import { toast } from "@/components/ui/toast";
 import type { Project } from "@/types";
 
-// ── Zod Validation Schema ────────────────────────────────────────────────────
+// Zod Validation Schema
 const projectFormSchema = zod.object({
   name: zod.string().min(1, "Project name is required").max(50, "Name must be under 50 characters"),
   description: zod.string().max(200, "Description must be under 200 characters").nullable().optional(),

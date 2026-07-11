@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Create Report Route Page — Renders the weekly report creation form
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { Metadata } from "next";
 import { ReportForm } from "@/features/reports";

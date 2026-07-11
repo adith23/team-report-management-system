@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Projects Route Page — Secure project category management for managers
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { Metadata } from "next";
 import { AuthGuard } from "@/features/auth/auth-guard";

@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // RoleEditModal — Modal to change user role (Team Member or Manager)
-// ──────────────────────────────────────────────────────────────────────────────
 
 "use client";
 
@@ -21,7 +19,9 @@ interface RoleEditModalProps {
 }
 
 export function RoleEditModal({ open, onClose, user }: RoleEditModalProps) {
-  const [selectedRole, setSelectedRole] = useState<UserRole>(UserRole.TEAM_MEMBER);
+  const [selectedRole, setSelectedRole] = useState<UserRole>(
+    UserRole.TEAM_MEMBER,
+  );
   const updateRoleMutation = useUpdateUserRole();
   const { user: currentUser } = useAuthStore();
 
@@ -51,7 +51,7 @@ export function RoleEditModal({ open, onClose, user }: RoleEditModalProps) {
         onError: (err) => {
           toast.error(err.message || "Failed to update role.");
         },
-      }
+      },
     );
   };
 
@@ -67,7 +67,11 @@ export function RoleEditModal({ open, onClose, user }: RoleEditModalProps) {
       open={open}
       onClose={onClose}
       title="Edit User Role"
-      description={user ? `Update authorization permissions for ${user.full_name}` : undefined}
+      description={
+        user
+          ? `Update authorization permissions for ${user.full_name}`
+          : undefined
+      }
       size="sm"
     >
       <div className="space-y-4 pt-2">

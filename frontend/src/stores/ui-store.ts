@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // UI Store — Client-side UI preferences (Zustand + localStorage persistence)
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -12,7 +10,7 @@ interface UIState {
   /** Whether the mobile navigation drawer is open */
   mobileNavOpen: boolean;
 
-  // ── Actions ──────────────────────────────────────────────────────────────
+  // Actions
 
   /** Toggle sidebar between expanded and collapsed */
   toggleSidebar: () => void;
