@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // ReportForm — Create and edit weekly report form component
-// ──────────────────────────────────────────────────────────────────────────────
 
 "use client";
 
@@ -35,7 +33,7 @@ import { ROUTES } from "@/lib/constants";
 import { TaskType, ReportStatus } from "@/types/common";
 import type { ReportCreate, ReportUpdate } from "@/types";
 
-// ── Zod Validation Schema ────────────────────────────────────────────────────
+// Zod Validation Schema
 const reportSchema = zod.object({
   week_start: zod.string().min(1, "Week selection is required"),
   project_id: zod.string().min(1, "Project selection is required"),
@@ -93,7 +91,7 @@ export function ReportForm({ mode, reportId }: ReportFormProps) {
     },
   });
 
-  // ── Populate form state on edit mode load ──────────────────────────────────
+  // Populate form state on edit mode load
   useEffect(() => {
     if (mode === "edit" && existingReport) {
       // Set simple fields
@@ -133,7 +131,7 @@ export function ReportForm({ mode, reportId }: ReportFormProps) {
     }
   }, [mode, existingReport, reset]);
 
-  // ── Transform form states into API DTO structure ──────────────────────────
+  // Transform form states into API DTO structure
   const preparePayload = (data: ReportFormValues): ReportCreate => {
     return {
       project_id: data.project_id,
@@ -161,7 +159,7 @@ export function ReportForm({ mode, reportId }: ReportFormProps) {
     };
   };
 
-  // ── Validation checks ──────────────────────────────────────────────────────
+  // Validation checks
   const validateDynamicLists = (): boolean => {
     const activeCompleted = tasksCompleted.filter((t) => t.value.trim() !== "");
     const activePlanned = tasksPlanned.filter((t) => t.value.trim() !== "");
@@ -177,7 +175,7 @@ export function ReportForm({ mode, reportId }: ReportFormProps) {
     return true;
   };
 
-  // ── Action: Save as Draft ────────────────────────────────────────────────
+  // Action: Save as Draft
   const onSaveDraft = async (formValues: ReportFormValues) => {
     if (!validateDynamicLists()) return;
     const payload = preparePayload(formValues);
@@ -204,7 +202,7 @@ export function ReportForm({ mode, reportId }: ReportFormProps) {
     }
   };
 
-  // ── Action: Submit Report ────────────────────────────────────────────────
+  // Action: Submit Report
   const onSubmitReport = async (formValues: ReportFormValues) => {
     if (!validateDynamicLists()) return;
     const payload = preparePayload(formValues);

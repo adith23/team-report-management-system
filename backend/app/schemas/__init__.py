@@ -37,6 +37,9 @@ from app.schemas.dashboard import (  # noqa: F401
     WorkloadDistribution,
 )
 
+# AI
+from app.schemas.ai import ChatMessage, AIChatRequest  # noqa: F401
+
 __all__ = [
     # Common
     "PaginatedResponse",
@@ -68,4 +71,7 @@ __all__ = [
     "TaskTrendPoint",
     "WorkloadDistribution",
     "RecentActivity",
+    # AI
+    "ChatMessage",
+    "AIChatRequest",
 ]

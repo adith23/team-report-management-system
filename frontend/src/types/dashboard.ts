@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Dashboard Types — Analytics metrics and chart data shapes
-// ──────────────────────────────────────────────────────────────────────────────
 
 /** Top-level dashboard KPI metrics */
 export interface DashboardMetrics {

@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Toast — Notification system (store + component)
-// ──────────────────────────────────────────────────────────────────────────────
 
 "use client";
 
@@ -8,7 +6,7 @@ import { create } from "zustand";
 import { cn } from "@/lib/utils";
 import { X, CheckCircle2, AlertCircle, Info } from "lucide-react";
 
-// ── Toast Types ──────────────────────────────────────────────────────────────
+// Toast Types
 
 export type ToastType = "success" | "error" | "info" | "warning";
 
@@ -25,7 +23,7 @@ interface ToastState {
   removeToast: (id: string) => void;
 }
 
-// ── Toast Store ──────────────────────────────────────────────────────────────
+// Toast Store
 
 let toastCounter = 0;
 
@@ -55,7 +53,7 @@ export const useToastStore = create<ToastState>((set) => ({
     })),
 }));
 
-// ── Convenience functions ────────────────────────────────────────────────────
+// Convenience functions
 
 export const toast = {
   success: (message: string, duration?: number) =>
@@ -68,7 +66,7 @@ export const toast = {
     useToastStore.getState().addToast({ type: "warning", message, duration }),
 };
 
-// ── Toast Icon Map ───────────────────────────────────────────────────────────
+// Toast Icon Map
 
 const toastConfig: Record<
   ToastType,
@@ -92,7 +90,7 @@ const toastConfig: Record<
   },
 };
 
-// ── Single Toast Item ────────────────────────────────────────────────────────
+// Single Toast Item
 
 function ToastItem({ id, type, message }: Toast) {
   const { removeToast } = useToastStore();
@@ -123,7 +121,7 @@ function ToastItem({ id, type, message }: Toast) {
   );
 }
 
-// ── Toast Container ──────────────────────────────────────────────────────────
+// Toast Container
 
 export function ToastContainer() {
   const { toasts } = useToastStore();

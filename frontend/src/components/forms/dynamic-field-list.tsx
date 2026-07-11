@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Dynamic Field List — Add/remove text fields for tasks and blockers
-// ──────────────────────────────────────────────────────────────────────────────
 
 "use client";
 
@@ -9,7 +7,7 @@ import { Plus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
-// ── Field item shape ─────────────────────────────────────────────────────────
+// Field item shape
 
 export interface DynamicFieldItem {
   /** Text content */
@@ -18,7 +16,7 @@ export interface DynamicFieldItem {
   meta?: Record<string, unknown>;
 }
 
-// ── Props ────────────────────────────────────────────────────────────────────
+// Props
 
 interface DynamicFieldListProps {
   /** Current field values */
@@ -83,7 +81,7 @@ export function DynamicFieldList({
   disabled = false,
   className,
 }: DynamicFieldListProps) {
-  // ── Add item ─────────────────────────────────────────────────────────────
+  // Add item
 
   const addItem = useCallback(() => {
     if (items.length >= maxItems) return;
@@ -94,7 +92,7 @@ export function DynamicFieldList({
     onChange([...items, newItem]);
   }, [items, maxItems, onChange, showCheckbox, checkboxMetaKey]);
 
-  // ── Remove item ──────────────────────────────────────────────────────────
+  // Remove item
 
   const removeItem = useCallback(
     (index: number) => {
@@ -104,7 +102,7 @@ export function DynamicFieldList({
     [items, minItems, onChange],
   );
 
-  // ── Update item text ─────────────────────────────────────────────────────
+  // Update item text
 
   const updateValue = useCallback(
     (index: number, value: string) => {
@@ -115,7 +113,7 @@ export function DynamicFieldList({
     [items, onChange],
   );
 
-  // ── Update checkbox ──────────────────────────────────────────────────────
+  // Update checkbox
 
   const updateCheckbox = useCallback(
     (index: number, checked: boolean) => {

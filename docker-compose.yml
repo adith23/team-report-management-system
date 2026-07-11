@@ -1,0 +1,87 @@
+# ═══════════════════════════════════════════════════════════════
+# Docker Compose — Team Report Management System
+# ═══════════════════════════════════════════════════════════════
+#
+# Usage:
+#   docker compose up --build        Start all services (first time)
+#   docker compose up                Start all services (subsequent)
+#   docker compose down              Stop all services
+#   docker compose down -v           Stop + delete database data
+#   docker compose logs -f backend   Follow backend logs
+#
+# ═══════════════════════════════════════════════════════════════
+
+services:
+
+  # ── PostgreSQL Database ─────────────────────────────────────
+  db:
+    image: postgres:16
+    container_name: team-reports-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pass1234
+      POSTGRES_DB: team_reports_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d team_reports_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── FastAPI Backend ─────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: team-reports-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # Application
+      APP_NAME: Team Report Management System
+      APP_ENV: development
+      DEBUG: "true"
+      # Database — uses Docker service name 'db' as hostname (not localhost)
+      DATABASE_URL: postgresql+asyncpg://postgres:pass1234@db:5432/team_reports_db
+      # JWT
+      JWT_SECRET_KEY: your-super-secret-key-change-in-production
+      JWT_ALGORITHM: HS256
+      JWT_ACCESS_TOKEN_EXPIRE_MINUTES: "1440"
+      # CORS
+      CORS_ORIGINS: '["http://localhost:3000"]'
+      # Admin Bootstrap
+      ADMIN_BOOTSTRAP_EMAIL: admin@company.com
+    depends_on:
+      db:
+        condition: service_healthy
+    # Run Alembic migrations automatically, then start the server.
+    # If migrations fail, the container exits with an error (fail-fast).
+    command: >
+      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+  # ── Next.js Frontend ────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: team-reports-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Browser-facing URL — must be localhost because the reviewer's
+      # browser runs on the host machine, not inside Docker.
+      NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
+    depends_on:
+      - backend
+
+# ── Named Volumes ───────────────────────────────────────────
+# Persists database data across restarts.
+# Only removed with: docker compose down -v
+volumes:
+  postgres_data:

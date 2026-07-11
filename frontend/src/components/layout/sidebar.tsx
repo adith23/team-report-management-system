@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Sidebar — Main navigation sidebar with role-based filtering
-// ──────────────────────────────────────────────────────────────────────────────
 
 "use client";
 
@@ -26,7 +24,7 @@ import { NAV_ITEMS } from "@/lib/constants";
 import { Avatar } from "@/components/ui/avatar";
 import type { UserRole } from "@/types/common";
 
-// ── Icon Map ─────────────────────────────────────────────────────────────────
+// Icon Map
 // Maps icon name strings from NAV_ITEMS to Lucide React components.
 
 const iconMap: Record<string, React.ElementType> = {

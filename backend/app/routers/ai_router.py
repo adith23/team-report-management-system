@@ -11,12 +11,12 @@ Access is restricted to Managers only.
 import logging
 from datetime import date
 from fastapi import APIRouter, Depends, Query, Body, HTTPException, status
-from pydantic import BaseModel, Field
 
 from app.core import require_role
 from app.core.dependencies import get_ai_service
 from app.core.enums import UserRole
 from app.models.user import User
+from app.schemas import AIChatRequest
 from app.services import AIService
 
 logger = logging.getLogger(__name__)
@@ -27,25 +27,6 @@ router = APIRouter(
     tags=["AI Assistant"],
     dependencies=[Depends(require_role(UserRole.MANAGER))],
 )
-
-
-class ChatMessage(BaseModel):
-    role: str = Field(..., description="Role of the message author: 'user' or 'assistant'")
-    content: str = Field(..., description="Text content of the message")
-
-
-class AIChatRequest(BaseModel):
-    message: str | None = Field(default=None, description="The message string to the assistant")
-    query: str | None = Field(default=None, description="Query string alias for backwards compatibility")
-    history: list[ChatMessage] | None = Field(default=None, description="Optional conversation history")
-
-    @property
-    def prompt_text(self) -> str:
-        """Extract the query text from whichever field is populated."""
-        val = self.message or self.query
-        if not val:
-            raise ValueError("Either 'message' or 'query' must be provided in the request body.")
-        return val
 
 
 @router.post(
@@ -65,10 +46,9 @@ async def chat(
         query_text = payload.prompt_text
     except ValueError as val_err:
         raise HTTPException(
-            status_code=status.HTTP_420_METHOD_FAILURE,
-            detail=str(val_err)
+            status_code=status.HTTP_420_METHOD_FAILURE, detail=str(val_err)
         )
-    
+
     response_text = await ai_service.chat(query_text, manager=current_user)
     return {"response": response_text}
 

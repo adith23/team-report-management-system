@@ -31,7 +31,7 @@ from pydantic import BaseModel
 from app.config import settings
 from app.core.enums import UserRole
 
-# ── Argon2 Password Hasher ───────────────────────────────────────
+# Argon2 Password Hasher
 # Using default parameters which provide a good balance of security
 # and performance for a web application:
 # - time_cost=3 (number of iterations)
@@ -73,7 +73,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         return False
 
 
-# ── JWT Token Payload ────────────────────────────────────────────
+# JWT Token Payload
 class TokenPayload(BaseModel):
     """
     Decoded JWT token payload.
@@ -158,7 +158,7 @@ def decode_access_token(token: str) -> TokenPayload:
     )
 
 
-# ── Cookie Utilities ─────────────────────────────────────────────
+# Cookie Utilities
 _COOKIE_KEY = "access_token"
 _COOKIE_MAX_AGE = settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES * 60  # seconds
 

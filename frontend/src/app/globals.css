@@ -65,7 +65,7 @@
   }
 }
 
-/* ── Scrollbar styling ────────────────────────────────────────────────── */
+/* Scrollbar styling */
 @layer base {
   ::-webkit-scrollbar {
     width: 6px;
@@ -86,7 +86,7 @@
   }
 }
 
-/* ── Animations ───────────────────────────────────────────────────────── */
+/* Animations */
 @keyframes fade-in {
   from {
     opacity: 0;

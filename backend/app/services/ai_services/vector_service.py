@@ -10,7 +10,7 @@ import logging
 from pinecone import Pinecone, ServerlessSpec
 
 from app.config import settings
-from app.services.ai.embedding_service import EmbeddingService
+from app.services.ai_services.embedding_service import EmbeddingService
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ class VectorService:
         self._embedding_service = embedding_service
         self._api_key = settings.PINECONE_API_KEY
         self._index_name = settings.PINECONE_INDEX_NAME
-        
+
         # Local in-memory store for fallback/mock operations
         self._mock_db = []
         self._index = None
@@ -32,11 +32,14 @@ class VectorService:
         if self._api_key and self._api_key != "your-pinecone-key-here":
             try:
                 self._pc = Pinecone(api_key=self._api_key)
-                
+
                 # Check and create index if necessary (multilingual-e5-large uses 1024 dimensions)
                 existing_indexes = [idx.name for idx in self._pc.list_indexes()]
                 if self._index_name not in existing_indexes:
-                    logger.info("Creating serverless Pinecone index: %s (1024 dimensions)", self._index_name)
+                    logger.info(
+                        "Creating serverless Pinecone index: %s (1024 dimensions)",
+                        self._index_name,
+                    )
                     self._pc.create_index(
                         name=self._index_name,
                         dimension=1024,
@@ -44,12 +47,19 @@ class VectorService:
                         spec=ServerlessSpec(cloud="aws", region="us-east-1"),
                     )
                 self._index = self._pc.Index(self._index_name)
-                logger.info("Pinecone service initialized successfully on index: %s", self._index_name)
+                logger.info(
+                    "Pinecone service initialized successfully on index: %s",
+                    self._index_name,
+                )
             except Exception as e:
-                logger.error("Failed to initialize Pinecone: %s. Reverting to Mock mode.", str(e))
+                logger.error(
+                    "Failed to initialize Pinecone: %s. Reverting to Mock mode.", str(e)
+                )
                 self._index = None
         else:
-            logger.warning("PINECONE_API_KEY not configured. Running VectorService in local mock mode.")
+            logger.warning(
+                "PINECONE_API_KEY not configured. Running VectorService in local mock mode."
+            )
 
     def _format_report_text(self, report_data: dict) -> str:
         """
@@ -61,7 +71,7 @@ class VectorService:
             f"Reporting Week: {report_data.get('week_start', '')} to {report_data.get('week_end', '')}",
             f"Hours Worked: {report_data.get('hours_worked') or 0} hrs",
         ]
-        
+
         tasks_completed = report_data.get("tasks_completed", [])
         if tasks_completed:
             lines.append("Completed Tasks:")
@@ -80,7 +90,7 @@ class VectorService:
             for b in blockers:
                 status = "Resolved" if b.get("is_resolved") else "UNRESOLVED"
                 lines.append(f"- [{status}] {b.get('description')}")
-        
+
         if report_data.get("notes"):
             lines.append(f"Additional Notes: {report_data.get('notes')}")
 
@@ -91,10 +101,12 @@ class VectorService:
         Generate embedding for a report and insert/update it in the vector database.
         """
         text_content = self._format_report_text(report_data)
-        
+
         try:
             # Pass is_query=False for indexing text passages
-            vector = await self._embedding_service.get_embedding(text_content, is_query=False)
+            vector = await self._embedding_service.get_embedding(
+                text_content, is_query=False
+            )
         except Exception as e:
             logger.error("Failed to generate embedding during upsert: %s", str(e))
             return
@@ -111,22 +123,26 @@ class VectorService:
 
         # 1. Update local mock database
         self._mock_db = [item for item in self._mock_db if item["id"] != report_id]
-        self._mock_db.append({
-            "id": report_id,
-            "values": vector,
-            "metadata": metadata,
-        })
+        self._mock_db.append(
+            {
+                "id": report_id,
+                "values": vector,
+                "metadata": metadata,
+            }
+        )
         logger.info("Local vector cache updated for report_id: %s", report_id)
 
         # 2. Update Pinecone index if active
         if self._index:
             try:
-                self._index.upsert(
-                    vectors=[(report_id, vector, metadata)]
+                self._index.upsert(vectors=[(report_id, vector, metadata)])
+                logger.info(
+                    "Pinecone database index updated for report_id: %s", report_id
                 )
-                logger.info("Pinecone database index updated for report_id: %s", report_id)
             except Exception as e:
-                logger.error("Pinecone upsert failed for report_id %s: %s", report_id, str(e))
+                logger.error(
+                    "Pinecone upsert failed for report_id %s: %s", report_id, str(e)
+                )
 
     async def query_similar(self, query: str, limit: int = 5) -> list[dict]:
         """
@@ -134,7 +150,9 @@ class VectorService:
         """
         try:
             # Pass is_query=True for query embedding
-            query_vector = await self._embedding_service.get_embedding(query, is_query=True)
+            query_vector = await self._embedding_service.get_embedding(
+                query, is_query=True
+            )
         except Exception as e:
             logger.error("Failed to embed query: %s", str(e))
             return []
@@ -149,16 +167,25 @@ class VectorService:
                 )
                 results = []
                 for match in response.matches:
-                    results.append({
-                        "id": match.id,
-                        "score": match.score,
-                        "metadata": match.metadata,
-                        "text": match.metadata.get("text", ""),
-                    })
-                logger.info("Pinecone RAG retrieval returned %s matches for query: %s", len(results), query[:30])
+                    results.append(
+                        {
+                            "id": match.id,
+                            "score": match.score,
+                            "metadata": match.metadata,
+                            "text": match.metadata.get("text", ""),
+                        }
+                    )
+                logger.info(
+                    "Pinecone RAG retrieval returned %s matches for query: %s",
+                    len(results),
+                    query[:30],
+                )
                 return results
             except Exception as e:
-                logger.error("Pinecone similarity search failed: %s. Falling back to local search.", str(e))
+                logger.error(
+                    "Pinecone similarity search failed: %s. Falling back to local search.",
+                    str(e),
+                )
 
         # 2. Local Fallback Search (In-memory cosine similarity using pure Python)
         if not self._mock_db:
@@ -169,14 +196,20 @@ class VectorService:
         for item in self._mock_db:
             # Pure Python dot product of normalized lists (length 1024)
             dot_product = sum(a * b for a, b in zip(query_vector, item["values"]))
-            scored_items.append({
-                "id": item["id"],
-                "score": float(dot_product),
-                "metadata": item["metadata"],
-                "text": item["metadata"]["text"],
-            })
+            scored_items.append(
+                {
+                    "id": item["id"],
+                    "score": float(dot_product),
+                    "metadata": item["metadata"],
+                    "text": item["metadata"]["text"],
+                }
+            )
 
         scored_items.sort(key=lambda x: x["score"], reverse=True)
         results = scored_items[:limit]
-        logger.info("Local RAG retrieval returned %s matches for query: %s", len(results), query[:30])
+        logger.info(
+            "Local RAG retrieval returned %s matches for query: %s",
+            len(results),
+            query[:30],
+        )
         return results

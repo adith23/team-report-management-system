@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Auth Layout — Shared layout structure for authentication pages
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { Layers } from "lucide-react";
 

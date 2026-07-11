@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Card — Container component with optional hover effect
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { cn } from "@/lib/utils";
 
@@ -62,7 +60,7 @@ export function Card({
   );
 }
 
-// ── Sub-components for structured card layouts ────────────────────────────────
+// Sub-components for structured card layouts
 
 export function CardHeader({
   children,

@@ -1,0 +1,20 @@
+# Dependencies (reinstalled inside container via npm ci)
+node_modules/
+
+# Next.js build output
+.next/
+
+# Environment variables (injected by Docker Compose)
+.env.local
+.env
+
+# Git
+.git/
+.gitignore
+
+# Documentation (not needed in container)
+*.md
+
+# OS files
+.DS_Store
+Thumbs.db

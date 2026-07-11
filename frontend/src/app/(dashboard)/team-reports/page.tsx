@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // TeamReports Route Page — Secure team reports dashboard for managers
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { Metadata } from "next";
 import { AuthGuard } from "@/features/auth/auth-guard";

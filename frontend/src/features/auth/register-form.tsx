@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // RegisterForm — Component for creating a new user account
-// ──────────────────────────────────────────────────────────────────────────────
 
 "use client";
 
@@ -15,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { ROUTES } from "@/lib/constants";
 
-// ── Zod Validation Schema ────────────────────────────────────────────────────
+// Zod Validation Schema
 const registerSchema = zod
   .object({
     full_name: zod.string().min(1, "Full name is required"),

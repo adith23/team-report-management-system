@@ -24,38 +24,38 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # ── Application ──────────────────────────────────────────────
+    # Application
     APP_NAME: str = "Team Report Management System"
     APP_ENV: str = "development"
     DEBUG: bool = True
 
-    # ── Database ─────────────────────────────────────────────────
+    # Database
     DATABASE_URL: str
     """
     Async PostgreSQL connection string.
     Format: postgresql+asyncpg://user:password@host:port/dbname
     """
 
-    # ── JWT Authentication ───────────────────────────────────────
+    # JWT Authentication
     JWT_SECRET_KEY: str
     """Secret key for signing JWT tokens. Must be changed in production."""
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
 
-    # ── CORS ─────────────────────────────────────────────────────
+    # CORS
     CORS_ORIGINS: list[str] = [
         "http://localhost:3000",
         "http://localhost:5173",
     ]
 
-    # ── Admin Bootstrap ──────────────────────────────────────────
+    # Admin Bootstrap
     ADMIN_BOOTSTRAP_EMAIL: str = "admin@company.com"
     """
     Email address that automatically receives MANAGER role on registration.
     Used to solve the bootstrap problem — the first admin in the system.
     """
 
-    # ── AI (Optional) ────────────────────────────────────────────
+    # AI (Optional)
     OPENAI_API_KEY: str | None = None
     GEMINI_API_KEY: str | None = None
     PINECONE_API_KEY: str | None = None

@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Status Badge — Renders ReportStatus as a colored pill using STATUS_CONFIG
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { cn } from "@/lib/utils";
 import { STATUS_CONFIG } from "@/lib/constants";

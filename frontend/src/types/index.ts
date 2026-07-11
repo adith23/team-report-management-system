@@ -1,7 +1,5 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Type Barrel Export — Single import point for all type definitions
 // Usage: import { User, Report, UserRole, ... } from "@/types";
-// ──────────────────────────────────────────────────────────────────────────────
 
 export * from "./common";
 export * from "./auth";

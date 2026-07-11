@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Auth Store — Client-side authentication state (Zustand)
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { create } from "zustand";
 import type { User } from "@/types/auth";
@@ -19,7 +17,7 @@ interface AuthState {
    */
   isLoading: boolean;
 
-  // ── Actions ──────────────────────────────────────────────────────────────
+  // Actions
 
   /** Set the authenticated user (called after successful login or /auth/me) */
   setUser: (user: User) => void;
@@ -30,7 +28,7 @@ interface AuthState {
   /** Update the loading state */
   setLoading: (loading: boolean) => void;
 
-  // ── Derived Accessors ────────────────────────────────────────────────────
+  // Derived Accessors
 
   /** Check if the current user has the MANAGER role */
   isManager: () => boolean;

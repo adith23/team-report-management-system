@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Textarea — Multi-line text input with label, error, and character count
-// ──────────────────────────────────────────────────────────────────────────────
 
 "use client";
 
@@ -12,8 +10,7 @@ import {
 } from "react";
 import { cn } from "@/lib/utils";
 
-export interface TextareaProps
-  extends TextareaHTMLAttributes<HTMLTextAreaElement> {
+export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   /** Label text displayed above the textarea */
   label?: string;
   /** Error message displayed below the textarea */

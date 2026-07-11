@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Dashboard Hooks — TanStack Query hooks for analytics data (manager only)
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";

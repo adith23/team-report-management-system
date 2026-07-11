@@ -74,7 +74,7 @@ class BadRequestException(AppException):
         super().__init__(status_code=400, detail=detail)
 
 
-# ── Global Exception Handler ────────────────────────────────────
+# Global Exception Handler
 async def app_exception_handler(
     request: Request,  # noqa: ARG001
     exc: AppException,

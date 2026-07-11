@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Dropdown Menu — Click-triggered dropdown with keyboard navigation
-// ──────────────────────────────────────────────────────────────────────────────
 
 "use client";
 
@@ -101,7 +99,7 @@ export function DropdownMenu({
   );
 }
 
-// ── Menu Item ────────────────────────────────────────────────────────────────
+// Menu Item
 
 interface DropdownMenuItemProps {
   children: React.ReactNode;
@@ -144,7 +142,7 @@ export function DropdownMenuItem({
   );
 }
 
-// ── Divider ──────────────────────────────────────────────────────────────────
+// Divider
 
 export function DropdownMenuDivider() {
   return (
@@ -155,7 +153,7 @@ export function DropdownMenuDivider() {
   );
 }
 
-// ── Label ────────────────────────────────────────────────────────────────────
+// Label
 
 export function DropdownMenuLabel({
   children,

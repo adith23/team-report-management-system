@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Report Types — Weekly report entity and related CRUD shapes
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { ReportStatus, TaskType } from "./common";
 

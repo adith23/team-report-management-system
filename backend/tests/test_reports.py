@@ -41,7 +41,7 @@ async def test_create_report_draft_success(
 
     data = response.json()
     assert data["week_start"] == "2026-07-06"  # Snapped Monday
-    assert data["week_end"] == "2026-07-12"    # Calculated Sunday
+    assert data["week_end"] == "2026-07-12"  # Calculated Sunday
     assert data["status"] == ReportStatus.DRAFT.value
     assert len(data["tasks_completed"]) == 2
     assert len(data["tasks_planned"]) == 1
@@ -50,10 +50,7 @@ async def test_create_report_draft_success(
 
     # Check database
     report_id = uuid.UUID(data["id"])
-    stmt = (
-        select(WeeklyReport)
-        .where(WeeklyReport.id == report_id)
-    )
+    stmt = select(WeeklyReport).where(WeeklyReport.id == report_id)
     result = await db_session.execute(stmt)
     report = result.scalar_one_or_none()
     assert report is not None
@@ -144,7 +141,10 @@ async def test_update_report_resets_submitted_to_draft(
 
     # Submit
     submit_res = await member_client.post(f"/api/v1/reports/{report_id}/submit")
-    assert submit_res.json()["status"] in (ReportStatus.SUBMITTED.value, ReportStatus.LATE.value)
+    assert submit_res.json()["status"] in (
+        ReportStatus.SUBMITTED.value,
+        ReportStatus.LATE.value,
+    )
 
     # Update
     update_payload = {
@@ -157,6 +157,7 @@ async def test_update_report_resets_submitted_to_draft(
     assert update_res.json()["status"] == ReportStatus.DRAFT.value
     assert update_res.json()["submitted_at"] is None
 
+
 @pytest.mark.asyncio
 async def test_update_report_tasks_and_blockers(
     member_client: AsyncClient, active_project: Project, db_session: AsyncSession
@@ -166,8 +167,12 @@ async def test_update_report_tasks_and_blockers(
     payload = {
         "project_id": str(active_project.id),
         "week_start": "2026-07-06",
-        "tasks_completed": [{"description": "Initial task completed", "task_type": "COMPLETED"}],
-        "tasks_planned": [{"description": "Initial task planned", "task_type": "PLANNED"}],
+        "tasks_completed": [
+            {"description": "Initial task completed", "task_type": "COMPLETED"}
+        ],
+        "tasks_planned": [
+            {"description": "Initial task planned", "task_type": "PLANNED"}
+        ],
         "blockers": [{"description": "Initial blocker", "is_resolved": False}],
     }
     create_res = await member_client.post("/api/v1/reports/", json=payload)
@@ -203,7 +208,6 @@ async def test_update_report_tasks_and_blockers(
     assert len(data["blockers"]) == 1
     assert data["blockers"][0]["description"] == "Updated blocker"
     assert data["blockers"][0]["is_resolved"] is True
-
 
 
 @pytest.mark.asyncio
@@ -284,7 +288,9 @@ async def test_create_and_update_with_submit_query_param(
     payload = {
         "project_id": str(active_project.id),
         "week_start": str(future_date),
-        "tasks_completed": [{"description": "Immediate completion task", "task_type": "COMPLETED"}],
+        "tasks_completed": [
+            {"description": "Immediate completion task", "task_type": "COMPLETED"}
+        ],
         "tasks_planned": [],
     }
     create_res = await member_client.post("/api/v1/reports/?submit=true", json=payload)
@@ -296,8 +302,9 @@ async def test_create_and_update_with_submit_query_param(
     update_payload = {
         "notes": "Updated note during resubmit",
     }
-    update_res = await member_client.put(f"/api/v1/reports/{report_id}?submit=true", json=update_payload)
+    update_res = await member_client.put(
+        f"/api/v1/reports/{report_id}?submit=true", json=update_payload
+    )
     assert update_res.status_code == 200
     assert update_res.json()["status"] == ReportStatus.SUBMITTED.value
     assert update_res.json()["notes"] == "Updated note during resubmit"
-

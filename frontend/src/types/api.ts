@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // API Types — Generic response wrappers for the API client layer
-// ──────────────────────────────────────────────────────────────────────────────
 
 /** Structured API error returned by the backend */
 export interface ApiErrorResponse {

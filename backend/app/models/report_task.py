@@ -34,7 +34,7 @@ class ReportTask(Base, UUIDPrimaryKeyMixin):
 
     __tablename__ = "report_tasks"
 
-    # ── Foreign Key ──────────────────────────────────────────────
+    # Foreign Key
     report_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("weekly_reports.id", ondelete="CASCADE"),
         nullable=False,
@@ -42,7 +42,7 @@ class ReportTask(Base, UUIDPrimaryKeyMixin):
         comment="Parent report this task belongs to",
     )
 
-    # ── Task Data ────────────────────────────────────────────────
+    # Task Data
     task_type: Mapped[TaskType] = mapped_column(
         nullable=False,
         comment="COMPLETED (done this week) or PLANNED (next week)",
@@ -53,7 +53,7 @@ class ReportTask(Base, UUIDPrimaryKeyMixin):
         comment="Task description text",
     )
 
-    # ── Ordering ─────────────────────────────────────────────────
+    # Ordering
     sort_order: Mapped[int] = mapped_column(
         Integer,
         default=0,
@@ -61,13 +61,13 @@ class ReportTask(Base, UUIDPrimaryKeyMixin):
         comment="Preserves user's ordering within the form",
     )
 
-    # ── Timestamp ────────────────────────────────────────────────
+    # Timestamp
     created_at: Mapped[datetime] = mapped_column(
         server_default=func.now(),
         nullable=False,
     )
 
-    # ── Relationship ─────────────────────────────────────────────
+    # Relationship
     report: Mapped["WeeklyReport"] = relationship(
         "WeeklyReport",
         back_populates="tasks",

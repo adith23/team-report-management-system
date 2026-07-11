@@ -9,7 +9,11 @@ Handles:
 import logging
 from app.config import settings
 from app.core.enums import UserRole
-from app.core.exceptions import DuplicateException, UnauthorizedException, ForbiddenException
+from app.core.exceptions import (
+    DuplicateException,
+    UnauthorizedException,
+    ForbiddenException,
+)
 from app.core.security import hash_password, verify_password, create_access_token
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
@@ -89,10 +93,14 @@ class AuthService:
 
         # 3. Verify user is active
         if not user.is_active:
-            raise ForbiddenException("Your account is deactivated. Please contact support.")
+            raise ForbiddenException(
+                "Your account is deactivated. Please contact support."
+            )
 
         # 4. Generate JWT access token
         token = create_access_token(user.id, user.role)
 
-        logger.info("User logged in: %s (id=%s, role=%s)", user.email, user.id, user.role.value)
+        logger.info(
+            "User logged in: %s (id=%s, role=%s)", user.email, user.id, user.role.value
+        )
         return user, token

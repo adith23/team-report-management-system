@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Report Hooks — TanStack Query hooks for report CRUD operations
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";

@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Common Types — Mirrors backend app/core/enums.py and shared response schemas
-// ──────────────────────────────────────────────────────────────────────────────
 
 /** User roles — mirrors backend UserRole enum exactly */
 export enum UserRole {

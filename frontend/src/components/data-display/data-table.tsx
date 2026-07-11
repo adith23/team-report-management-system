@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // DataTable — Generic table with sorting, loading skeleton, and empty state
-// ──────────────────────────────────────────────────────────────────────────────
 
 "use client";
 
@@ -10,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/data-display/empty-state";
 
-// ── Column Definition ────────────────────────────────────────────────────────
+// Column Definition
 
 export interface Column<T> {
   /** Unique key matching a property on the data object */
@@ -27,7 +25,7 @@ export interface Column<T> {
   cellClassName?: string;
 }
 
-// ── Props ────────────────────────────────────────────────────────────────────
+// Props
 
 interface DataTableProps<T> {
   /** Column definitions */
@@ -83,7 +81,7 @@ export function DataTable<T extends Record<string, unknown>>({
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
 
-  // ── Sort handler ─────────────────────────────────────────────────────────
+  // Sort handler
 
   const handleSort = useCallback(
     (key: string) => {
@@ -103,7 +101,7 @@ export function DataTable<T extends Record<string, unknown>>({
     [sortKey, sortDirection],
   );
 
-  // ── Sorted data ──────────────────────────────────────────────────────────
+  // Sorted data
 
   const sortedData = useMemo(() => {
     if (!sortKey || !sortDirection) return data;
@@ -129,7 +127,7 @@ export function DataTable<T extends Record<string, unknown>>({
     });
   }, [data, sortKey, sortDirection]);
 
-  // ── Sort icon ────────────────────────────────────────────────────────────
+  // Sort icon
 
   function SortIcon({ columnKey }: { columnKey: string }) {
     if (sortKey !== columnKey) {
@@ -141,11 +139,16 @@ export function DataTable<T extends Record<string, unknown>>({
     return <ArrowDown className="h-3.5 w-3.5" />;
   }
 
-  // ── Loading skeleton ─────────────────────────────────────────────────────
+  // Loading skeleton
 
   if (loading) {
     return (
-      <div className={cn("overflow-x-auto rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))]", className)}>
+      <div
+        className={cn(
+          "overflow-x-auto rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))]",
+          className,
+        )}
+      >
         <table className="w-full">
           <thead>
             <tr className="border-b border-[hsl(var(--border))] bg-[hsl(var(--muted)/0.5)]">
@@ -178,7 +181,7 @@ export function DataTable<T extends Record<string, unknown>>({
     );
   }
 
-  // ── Empty state ──────────────────────────────────────────────────────────
+  // Empty state
 
   if (data.length === 0) {
     return (
@@ -190,10 +193,15 @@ export function DataTable<T extends Record<string, unknown>>({
     );
   }
 
-  // ── Table ────────────────────────────────────────────────────────────────
+  // Table
 
   return (
-    <div className={cn("overflow-x-auto rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))]", className)}>
+    <div
+      className={cn(
+        "overflow-x-auto rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))]",
+        className,
+      )}
+    >
       <table className="w-full">
         <thead>
           <tr className="border-b border-[hsl(var(--border))] bg-[hsl(var(--muted)/0.5)]">
@@ -202,7 +210,8 @@ export function DataTable<T extends Record<string, unknown>>({
                 key={col.key}
                 className={cn(
                   "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[hsl(var(--muted-foreground))]",
-                  col.sortable && "cursor-pointer select-none hover:text-[hsl(var(--foreground))]",
+                  col.sortable &&
+                    "cursor-pointer select-none hover:text-[hsl(var(--foreground))]",
                   col.headerClassName,
                 )}
                 onClick={col.sortable ? () => handleSort(col.key) : undefined}
@@ -236,7 +245,7 @@ export function DataTable<T extends Record<string, unknown>>({
                 >
                   {col.render
                     ? col.render(item, index)
-                    : (item[col.key] as React.ReactNode) ?? "—"}
+                    : ((item[col.key] as React.ReactNode) ?? "—")}
                 </td>
               ))}
             </tr>

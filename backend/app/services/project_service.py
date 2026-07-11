@@ -101,7 +101,9 @@ class ProjectService:
         logger.info("Project created: %s by manager %s", created.name, creator.email)
         return await self.get_project_by_id(created.id)
 
-    async def update_project(self, project_id: uuid.UUID, data: ProjectUpdate) -> Project:
+    async def update_project(
+        self, project_id: uuid.UUID, data: ProjectUpdate
+    ) -> Project:
         """
         Update project details.
 

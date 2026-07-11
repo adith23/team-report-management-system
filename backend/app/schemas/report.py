@@ -18,7 +18,7 @@ from pydantic import BaseModel, Field
 from app.core.enums import ReportStatus, TaskType
 
 
-# ── Nested Item Schemas ──────────────────────────────────────────
+# Nested Item Schemas
 class TaskItemCreate(BaseModel):
     """
     Task item for report creation/update.
@@ -74,7 +74,7 @@ class BlockerItemRead(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# ── Report Schemas ───────────────────────────────────────────────
+# Report Schemas
 class ReportCreate(BaseModel):
     """
     Weekly report creation request.

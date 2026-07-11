@@ -14,8 +14,8 @@ from datetime import date, timedelta
 from app.core.enums import ReportStatus
 from app.models.user import User
 from app.repositories.report_repository import ReportRepository
-from app.services.ai.llm_strategy import LLMStrategy
-from app.services.ai.vector_service import VectorService
+from app.services.ai_services.base_client import BaseLLMClient
+from app.services.ai_services.vector_service import VectorService
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ class AIService:
 
     def __init__(
         self,
-        llm: LLMStrategy,
+        llm: BaseLLMClient,
         report_repo: ReportRepository,
         vector_service: VectorService,
     ) -> None:
@@ -44,13 +44,21 @@ class AIService:
 
         formatted_lines = []
         for r in reports:
-            formatted_lines.append(f"### Report from {r.user.full_name} for Project '{r.project.name}'")
+            formatted_lines.append(
+                f"### Report from {r.user.full_name} for Project '{r.project.name}'"
+            )
             formatted_lines.append(f"- **Week starting:** {r.week_start}")
             formatted_lines.append(f"- **Submission Status:** {r.status.value}")
-            formatted_lines.append(f"- **Hours Worked:** {r.hours_worked if r.hours_worked is not None else 'N/A'}")
-            
+            formatted_lines.append(
+                f"- **Hours Worked:** {r.hours_worked if r.hours_worked is not None else 'N/A'}"
+            )
+
             # Tasks Completed
-            completed_tasks = [t.description for t in r.tasks if t.task_type.value == "COMPLETED" or t.task_type == "COMPLETED"]
+            completed_tasks = [
+                t.description
+                for t in r.tasks
+                if t.task_type.value == "COMPLETED" or t.task_type == "COMPLETED"
+            ]
             formatted_lines.append("  - **Completed Tasks:**")
             if completed_tasks:
                 for t in completed_tasks:
@@ -59,7 +67,11 @@ class AIService:
                 formatted_lines.append("    - None reported")
 
             # Tasks Planned
-            planned_tasks = [t.description for t in r.tasks if t.task_type.value == "PLANNED" or t.task_type == "PLANNED"]
+            planned_tasks = [
+                t.description
+                for t in r.tasks
+                if t.task_type.value == "PLANNED" or t.task_type == "PLANNED"
+            ]
             formatted_lines.append("  - **Planned Tasks:**")
             if planned_tasks:
                 for t in planned_tasks:
@@ -130,7 +142,7 @@ class AIService:
         """
         # 1. Retrieve semantically matching reports from Pinecone / Local cache
         similar_docs = await self._vector_service.query_similar(query, limit=8)
-        
+
         if similar_docs:
             # Construct context from semantic matches
             context_blocks = []
@@ -144,10 +156,15 @@ class AIService:
                     f"Content:\n{doc['text']}\n"
                 )
             context_data = "\n".join(context_blocks)
-            logger.info("RAG Context generated from %s semantic vector matches", len(similar_docs))
+            logger.info(
+                "RAG Context generated from %s semantic vector matches",
+                len(similar_docs),
+            )
         else:
             # 2. Database Fallback (if vector cache is clean or Pinecone is not indexing yet)
-            logger.warning("RAG vector index returned no matches. Falling back to direct database retrieval.")
+            logger.warning(
+                "RAG vector index returned no matches. Falling back to direct database retrieval."
+            )
             reports, _ = await self._report_repo.get_team_reports(
                 status=None,
                 limit=30,

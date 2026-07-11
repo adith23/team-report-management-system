@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // AuthGuard — Component to protect views and enforce authentication/roles
-// ──────────────────────────────────────────────────────────────────────────────
 
 "use client";
 
@@ -39,7 +37,15 @@ export function AuthGuard({ children, requiredRole }: AuthGuardProps) {
         router.replace("/reports"); // Redirect non-managers to their reports dashboard
       }
     }
-  }, [isLoading, isQueryLoading, isAuthenticated, isError, user, requiredRole, router]);
+  }, [
+    isLoading,
+    isQueryLoading,
+    isAuthenticated,
+    isError,
+    user,
+    requiredRole,
+    router,
+  ]);
 
   if (isLoading || isQueryLoading) {
     return (

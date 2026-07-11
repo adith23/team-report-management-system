@@ -20,18 +20,18 @@ from sqlalchemy.ext.asyncio import (
 
 from app.config import settings
 
-# ── Async Engine ─────────────────────────────────────────────────
+# Async Engine
 # The engine manages the connection pool to PostgreSQL.
 engine = create_async_engine(
     settings.DATABASE_URL,
     echo=settings.DEBUG,  # Log SQL statements in debug mode
-    pool_size=20,         # Max persistent connections
-    max_overflow=10,      # Extra connections allowed under load
-    pool_pre_ping=True,   # Verify connections before use (handles disconnects)
-    pool_recycle=3600,    # Recycle connections after 1 hour
+    pool_size=20,  # Max persistent connections
+    max_overflow=10,  # Extra connections allowed under load
+    pool_pre_ping=True,  # Verify connections before use (handles disconnects)
+    pool_recycle=3600,  # Recycle connections after 1 hour
 )
 
-# ── Async Session Factory ────────────────────────────────────────
+# Async Session Factory
 # Creates AsyncSession instances bound to the engine.
 # expire_on_commit=False prevents lazy-loading issues after commit.
 async_session_factory = async_sessionmaker(
@@ -42,7 +42,7 @@ async_session_factory = async_sessionmaker(
 )
 
 
-# ── Dependency ───────────────────────────────────────────────────
+# Dependency
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """
     FastAPI dependency that provides a database session per request.

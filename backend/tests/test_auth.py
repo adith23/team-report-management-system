@@ -52,7 +52,9 @@ async def test_register_admin_bootstrap(client: AsyncClient) -> None:
 
 
 @pytest.mark.asyncio
-async def test_register_duplicate_email(client: AsyncClient, team_member_user: User) -> None:
+async def test_register_duplicate_email(
+    client: AsyncClient, team_member_user: User
+) -> None:
     """Test registration rejects duplicate email."""
     payload = {
         "email": team_member_user.email,
@@ -78,7 +80,9 @@ async def test_login_success(client: AsyncClient, team_member_user: User) -> Non
 
 
 @pytest.mark.asyncio
-async def test_login_wrong_credentials(client: AsyncClient, team_member_user: User) -> None:
+async def test_login_wrong_credentials(
+    client: AsyncClient, team_member_user: User
+) -> None:
     """Test login fails with incorrect password."""
     payload = {
         "email": team_member_user.email,
@@ -107,7 +111,9 @@ async def test_login_deactivated_user(
 
 
 @pytest.mark.asyncio
-async def test_get_me_authenticated(member_client: AsyncClient, team_member_user: User) -> None:
+async def test_get_me_authenticated(
+    member_client: AsyncClient, team_member_user: User
+) -> None:
     """Test GET /auth/me returns current user info."""
     response = await member_client.get("/api/v1/auth/me")
     assert response.status_code == 200

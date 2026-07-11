@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // AI Hooks — TanStack Query hooks for AI chat assistant (Good to Have)
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";

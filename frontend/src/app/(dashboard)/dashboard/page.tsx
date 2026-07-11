@@ -1,6 +1,4 @@
-// ──────────────────────────────────────────────────────────────────────────────
 // Dashboard Route Page — Secure view for manager analytics hub
-// ──────────────────────────────────────────────────────────────────────────────
 
 import { Metadata } from "next";
 import { AuthGuard } from "@/features/auth/auth-guard";

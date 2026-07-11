@@ -38,11 +38,11 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-# ── Cookie name constant (must match security.py) ────────────────
+# Cookie name constant (must match security.py)
 _COOKIE_KEY = "access_token"
 
 
-# ── Current User Dependency ──────────────────────────────────────
+# Current User Dependency
 async def get_current_user(
     request: Request,
     db: AsyncSession = Depends(get_db),
@@ -68,12 +68,12 @@ async def get_current_user(
         UnauthorizedException: If cookie is missing, JWT is invalid,
                                 or user is not found/inactive.
     """
-    # Step 1: Extract token from cookie
+    # Extract token from cookie
     token = request.cookies.get(_COOKIE_KEY)
     if not token:
         raise UnauthorizedException("Authentication required. Please log in.")
 
-    # Step 2: Decode and validate JWT
+    # Decode and validate JWT
     try:
         payload = decode_access_token(token)
     except jwt.ExpiredSignatureError:
@@ -81,7 +81,7 @@ async def get_current_user(
     except jwt.InvalidTokenError:
         raise UnauthorizedException("Invalid authentication token.")
 
-    # Step 3: Fetch user from database
+    # Fetch user from database
     from app.models.user import User
 
     stmt = select(User).where(User.id == payload.sub)
@@ -91,14 +91,14 @@ async def get_current_user(
     if user is None:
         raise UnauthorizedException("User account not found.")
 
-    # Step 4: Check active status
+    # Check active status
     if not user.is_active:
         raise UnauthorizedException("User account has been deactivated.")
 
     return user
 
 
-# ── Role-Based Access Control Dependency ─────────────────────────
+# Role-Based Access Control Dependency
 def require_role(*allowed_roles: UserRole) -> Callable:
     """
     Factory that creates a dependency enforcing role-based access.
@@ -146,7 +146,7 @@ def require_role(*allowed_roles: UserRole) -> Callable:
     return role_checker
 
 
-# ── Service Dependencies ─────────────────────────────────────────
+# Service Dependencies
 async def get_auth_service(db: AsyncSession = Depends(get_db)) -> "AuthService":
     from app.repositories import UserRepository
     from app.services import AuthService
@@ -171,11 +171,13 @@ async def get_project_service(db: AsyncSession = Depends(get_db)) -> "ProjectSer
 _embedding_service = None
 _vector_service = None
 
+
 def get_vector_service() -> "VectorService":
     global _embedding_service, _vector_service
     if _vector_service is None:
-        from app.services.ai.embedding_service import EmbeddingService
-        from app.services.ai.vector_service import VectorService
+        from app.services.ai_services.embedding_service import EmbeddingService
+        from app.services.ai_services.vector_service import VectorService
+
         if _embedding_service is None:
             _embedding_service = EmbeddingService()
         _vector_service = VectorService(_embedding_service)
@@ -205,10 +207,10 @@ async def get_dashboard_service(
 async def get_ai_service(db: AsyncSession = Depends(get_db)) -> "AIService":
     from app.repositories import ReportRepository
     from app.services import AIService
-    from app.services.ai.gemini_strategy import GeminiStrategy
+    from app.services.ai_services.gemini_client import GeminiClient
 
     return AIService(
-        llm=GeminiStrategy(),
+        llm=GeminiClient(),
         report_repo=ReportRepository(db),
         vector_service=get_vector_service(),
     )
