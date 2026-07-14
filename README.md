@@ -400,21 +400,21 @@ docker compose down -v
 
 ### Backend (`backend/.env`)
 
-| Variable                          | Required | Default                          | Description                                                       |
-| --------------------------------- | -------- | -------------------------------- | ----------------------------------------------------------------- |
-| `APP_NAME`                        | No       | `Team Report Management System`  | Display name used in API metadata                                 |
-| `APP_ENV`                         | No       | `development`                    | `development` or `production`                                     |
-| `DEBUG`                           | No       | `true`                           | Enables `/docs` and `/redoc`; disable in production               |
-| `DATABASE_URL`                    | **Yes**  | —                                | Async Postgres DSN: `postgresql+asyncpg://user:pass@host:port/db` |
-| `JWT_SECRET_KEY`                  | **Yes**  | —                                | Secret used to sign JWTs — **must** be changed in production      |
-| `JWT_ALGORITHM`                   | No       | `HS256`                          | JWT signing algorithm                                             |
-| `JWT_ACCESS_TOKEN_EXPIRE_MINUTES` | No       | `1440`                           | Token lifetime in minutes (default: 24h)                          |
-| `CORS_ORIGINS`                    | No       | `["http://localhost:3000", ...]` | JSON array of allowed frontend origins                            |
-| `ADMIN_BOOTSTRAP_EMAIL`           | No       | `admin@company.com`              | Email that receives the `MANAGER` role on first registration      |
-| `OPENAI_API_KEY`                  | No       | —                                | Enables the OpenAI-backed AI assistant                            |
-| `GEMINI_API_KEY`                  | No       | —                                | Enables the Gemini-backed AI assistant                            |
-| `PINECONE_API_KEY`                | No       | —                                | Enables RAG context retrieval for the AI chat assistant           |
-| `PINECONE_INDEX_NAME`             | No       | `team-reports`                   | Pinecone index used for report embeddings                         |
+| Variable                          | Required | Default                                                                 | Description                                                       |
+| --------------------------------- | -------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `APP_NAME`                        | No       | `Team Report Management System`                                         | Display name used in API metadata                                 |
+| `APP_ENV`                         | No       | `development`                                                           | `development` or `production`                                     |
+| `DEBUG`                           | No       | `true`                                                                  | Enables `/docs` and `/redoc`; disable in production               |
+| `DATABASE_URL`                    | **Yes**  | `postgresql+asyncpg://postgres:password@localhost:5433/team_reports_db` | Async Postgres DSN: `postgresql+asyncpg://user:pass@host:port/db` |
+| `JWT_SECRET_KEY`                  | **Yes**  | —                                                                       | Secret used to sign JWTs — **must** be changed in production      |
+| `JWT_ALGORITHM`                   | No       | `HS256`                                                                 | JWT signing algorithm                                             |
+| `JWT_ACCESS_TOKEN_EXPIRE_MINUTES` | No       | `1440`                                                                  | Token lifetime in minutes (default: 24h)                          |
+| `CORS_ORIGINS`                    | No       | `["http://localhost:3000", ...]`                                        | JSON array of allowed frontend origins                            |
+| `ADMIN_BOOTSTRAP_EMAIL`           | No       | `admin@company.com`                                                     | Email that receives the `MANAGER` role on first registration      |
+| `OPENAI_API_KEY`                  | No       | —                                                                       | Enables the OpenAI-backed AI assistant                            |
+| `GEMINI_API_KEY`                  | No       | —                                                                       | Enables the Gemini-backed AI assistant                            |
+| `PINECONE_API_KEY`                | No       | —                                                                       | Enables RAG context retrieval for the AI chat assistant           |
+| `PINECONE_INDEX_NAME`             | No       | `team-reports`                                                          | Pinecone index used for report embeddings                         |
 
 > The AI assistant endpoints are **optional**. Without the AI keys configured, the rest of the application (auth, reports, dashboard) works normally — only `/api/v1/ai/*` will be unavailable.
 
