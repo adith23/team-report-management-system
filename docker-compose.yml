@@ -12,7 +12,6 @@
 # ═══════════════════════════════════════════════════════════════
 
 services:
-
   # ── PostgreSQL Database ─────────────────────────────────────
   db:
     image: postgres:16
@@ -23,7 +22,7 @@ services:
       POSTGRES_PASSWORD: pass1234
       POSTGRES_DB: team_reports_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
